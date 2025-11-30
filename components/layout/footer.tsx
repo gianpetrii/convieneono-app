@@ -8,23 +8,45 @@ export function Footer() {
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Base App</h3>
+            <h3 className="text-lg font-semibold">ConvieneONo</h3>
             <p className="text-sm text-muted-foreground">
-              Tu aplicación base para proyectos con Next.js y Firebase.
+              Toma decisiones financieras inteligentes. Descubre el costo real de tus grandes compras.
             </p>
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Navegación</h4>
+            <h4 className="text-sm font-semibold">Calculadoras</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/"
+                  href="/calculadora/auto"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Inicio
+                  Auto vs Inversión
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/calculadora/departamento"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Departamento vs Alquiler
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/ejemplos"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Ver Ejemplos
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold">Información</h4>
+            <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/about"
@@ -41,18 +63,12 @@ export function Footer() {
                   Contacto
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Legal</h4>
-            <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/privacy"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Política de Privacidad
+                  Privacidad
                 </Link>
               </li>
               <li>
@@ -60,7 +76,7 @@ export function Footer() {
                   href="/terms"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Términos y Condiciones
+                  Términos
                 </Link>
               </li>
             </ul>
@@ -85,12 +101,21 @@ export function Footer() {
                   Registrarse
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/dashboard"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Mis Comparaciones
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {currentYear} Base App. Todos los derechos reservados.</p>
+          <p>&copy; {currentYear} ConvieneONo. Todos los derechos reservados.</p>
+          <p className="mt-2">Hecho con ❤️ para ayudarte a tomar mejores decisiones financieras</p>
         </div>
       </div>
     </footer>

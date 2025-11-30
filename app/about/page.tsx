@@ -1,119 +1,189 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calculator, Target, Users, Heart } from "lucide-react";
+
+export const metadata = {
+  title: "Acerca de ConvieneONo",
+  description: "Conoce la historia detrás de ConvieneONo y cómo ayudamos a las personas a tomar mejores decisiones financieras",
+};
 
 export default function AboutPage() {
   return (
     <div className="container py-12 md:py-20">
       <div className="mx-auto max-w-3xl space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold">Acerca de Base App</h1>
+        <div className="space-y-4 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <Calculator className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold">Acerca de ConvieneONo</h1>
           <p className="text-lg text-muted-foreground">
-            Una aplicación base completa para acelerar el desarrollo de tus
-            proyectos.
+            Ayudamos a las personas a tomar decisiones financieras más inteligentes 
+            mostrándoles el costo real de sus grandes compras.
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Nuestra Misión</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              Nuestra Misión
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Base App nació de la necesidad de tener un punto de partida
-              sólido y bien estructurado para proyectos web modernos. Cada
-              proyecto nuevo requiere las mismas funcionalidades básicas:
-              autenticación, gestión de usuarios, páginas informativas y un
-              diseño atractivo.
+              ConvieneONo nació de una experiencia personal. Hace unos años, estaba por 
+              comprar mi primer auto y todos me decían "es una buena inversión". Pero cuando 
+              sumé TODOS los costos reales (seguro, mantenimiento, depreciación, combustible), 
+              me di cuenta de que en 5 años habría perdido más de $15,000.
             </p>
             <p>
-              Nuestra misión es proporcionar una base de código limpia,
-              mantenible y escalable que te permita enfocarte en lo que
-              realmente importa: las características únicas de tu aplicación.
+              Decidí seguir usando transporte público e invertir ese dinero. Hoy, esos ahorros 
+              se convirtieron en la inicial de mi departamento. Esa decisión cambió mi vida 
+              financiera.
+            </p>
+            <p className="font-semibold">
+              Creamos ConvieneONo para que tú también puedas ver el panorama completo antes 
+              de tomar decisiones financieras importantes.
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Tecnologías</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              El Problema que Resolvemos
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
+          <CardContent className="space-y-4">
+            <p>
+              La mayoría de las personas toman decisiones financieras importantes basándose 
+              solo en el precio de compra. Pero el precio es solo el comienzo:
+            </p>
+            <ul className="space-y-2 ml-4">
               <li className="flex items-start gap-2">
-                <span className="font-semibold">Next.js 14:</span>
-                <span className="text-muted-foreground">
-                  Framework de React con App Router para aplicaciones web
-                  modernas
+                <span className="text-primary mt-1">•</span>
+                <span>
+                  <strong>Gastos ocultos:</strong> Seguros, mantenimiento, impuestos y expensas 
+                  pueden duplicar el costo real a largo plazo
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="font-semibold">Firebase:</span>
-                <span className="text-muted-foreground">
-                  Autenticación, base de datos y almacenamiento en la nube
+                <span className="text-primary mt-1">•</span>
+                <span>
+                  <strong>Costo de oportunidad:</strong> El dinero que gastas hoy podría estar 
+                  generando rendimientos si lo invirtieras
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="font-semibold">Tailwind CSS:</span>
-                <span className="text-muted-foreground">
-                  Framework CSS utility-first para diseños personalizados
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-semibold">shadcn/ui:</span>
-                <span className="text-muted-foreground">
-                  Componentes UI hermosos y accesibles
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-semibold">TypeScript:</span>
-                <span className="text-muted-foreground">
-                  Tipado estático para código más seguro y mantenible
+                <span className="text-primary mt-1">•</span>
+                <span>
+                  <strong>Depreciación:</strong> Los autos pierden valor cada año, pero pocos 
+                  lo consideran en su decisión
                 </span>
               </li>
             </ul>
+            <p>
+              ConvieneONo te muestra todo esto de forma clara y visual, para que puedas tomar 
+              decisiones informadas.
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Características</CardTitle>
+            <CardTitle>Cómo Funciona</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              Nuestra metodología es simple pero poderosa:
+            </p>
+            <ol className="space-y-3 ml-4">
+              <li className="flex items-start gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  1
+                </span>
+                <div>
+                  <strong>Recopilamos tus datos reales:</strong> No usamos promedios. 
+                  Tú ingresas tu situación específica.
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  2
+                </span>
+                <div>
+                  <strong>Calculamos todos los costos:</strong> Incluimos gastos recurrentes, 
+                  depreciación, inflación y rendimientos de inversión.
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  3
+                </span>
+                <div>
+                  <strong>Mostramos comparaciones visuales:</strong> Gráficos claros que 
+                  proyectan tu situación a 1, 5, 10 y 20 años.
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  4
+                </span>
+                <div>
+                  <strong>Tú decides:</strong> Te damos la información, tú tomas la decisión 
+                  que mejor se ajuste a tus objetivos.
+                </div>
+              </li>
+            </ol>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-primary" />
+              Nuestros Valores
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="grid gap-2 md:grid-cols-2">
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                Autenticación completa
+            <ul className="space-y-3">
+              <li>
+                <strong className="text-primary">Transparencia:</strong> Mostramos todos 
+                los cálculos. Sin trucos, sin letra chica.
               </li>
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                Modo oscuro/claro
+              <li>
+                <strong className="text-primary">Simplicidad:</strong> Finanzas personales 
+                no tiene que ser complicado. Lo hacemos fácil de entender.
               </li>
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                Diseño responsive
+              <li>
+                <strong className="text-primary">Gratuito:</strong> Creemos que todos 
+                merecen acceso a herramientas para tomar mejores decisiones financieras.
               </li>
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                Protección de rutas
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                Notificaciones toast
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                Estados de carga
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                SEO optimizado
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                TypeScript
+              <li>
+                <strong className="text-primary">Sin sesgos:</strong> No vendemos autos, 
+                departamentos ni productos financieros. Solo te mostramos los números.
               </li>
             </ul>
           </CardContent>
         </Card>
+
+        <div className="bg-gradient-to-br from-emerald-500/10 via-blue-500/10 to-purple-500/10 rounded-lg p-8 text-center">
+          <h3 className="text-2xl font-bold mb-3">¿Listo para tomar una mejor decisión?</h3>
+          <p className="text-muted-foreground mb-4">
+            Únete a miles de personas que ya usaron ConvieneONo para tomar decisiones 
+            financieras más inteligentes.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/calculadora/auto" className="text-primary hover:underline font-semibold">
+              Calcular Auto →
+            </a>
+            <a href="/calculadora/departamento" className="text-primary hover:underline font-semibold">
+              Calcular Departamento →
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

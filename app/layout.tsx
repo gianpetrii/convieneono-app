@@ -8,8 +8,8 @@ import { Footer } from "@/components/layout/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Base App - Tu aplicación base",
-  description: "Aplicación base con Next.js, Firebase y Tailwind CSS",
+  title: "ConvieneONo - Calculadora de Decisiones Financieras",
+  description: "Descubre si conviene comprar un auto o departamento vs invertir tu dinero. Visualiza el costo real a largo plazo con gastos recurrentes y costo de oportunidad.",
 };
 
 export default function RootLayout({

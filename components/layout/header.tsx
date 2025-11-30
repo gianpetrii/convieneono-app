@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { LogOut, User, Menu } from "lucide-react";
+import { LogOut, User, Menu, Calculator } from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
@@ -16,7 +16,10 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold">Base App</span>
+            <Calculator className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              ConvieneONo
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
@@ -27,23 +30,29 @@ export function Header() {
               Inicio
             </Link>
             <Link
-              href="/about"
+              href="/calculadora/auto"
               className="text-sm font-medium transition-colors hover:text-primary"
             >
-              Acerca de
+              Calculadora Auto
             </Link>
             <Link
-              href="/contact"
+              href="/calculadora/departamento"
               className="text-sm font-medium transition-colors hover:text-primary"
             >
-              Contacto
+              Calculadora Depto
+            </Link>
+            <Link
+              href="/ejemplos"
+              className="text-sm font-medium transition-colors hover:text-primary"
+            >
+              Ejemplos
             </Link>
             {user && (
               <Link
                 href="/dashboard"
                 className="text-sm font-medium transition-colors hover:text-primary"
               >
-                Dashboard
+                Mis Comparaciones
               </Link>
             )}
           </nav>
@@ -97,18 +106,25 @@ export function Header() {
               Inicio
             </Link>
             <Link
-              href="/about"
+              href="/calculadora/auto"
               className="text-sm font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Acerca de
+              Calculadora Auto
             </Link>
             <Link
-              href="/contact"
+              href="/calculadora/departamento"
               className="text-sm font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Contacto
+              Calculadora Depto
+            </Link>
+            <Link
+              href="/ejemplos"
+              className="text-sm font-medium"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Ejemplos
             </Link>
             {user ? (
               <>

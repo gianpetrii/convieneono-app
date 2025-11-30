@@ -46,7 +46,7 @@ export default function ContactPage() {
         <div className="space-y-4 text-center">
           <h1 className="text-4xl font-bold">Contacto</h1>
           <p className="text-lg text-muted-foreground">
-            ¿Tienes alguna pregunta? Nos encantaría saber de ti.
+            ¿Tienes preguntas, sugerencias o encontraste un error? Nos encantaría saber de ti.
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export default function ContactPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">contacto@baseapp.com</p>
+              <p className="text-muted-foreground">contacto@convieneono.com</p>
             </CardContent>
           </Card>
 
@@ -67,12 +67,12 @@ export default function ContactPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
-                Soporte
+                Respuesta Rápida
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Respuesta en menos de 24 horas
+                Te respondemos en menos de 24 horas
               </p>
             </CardContent>
           </Card>
