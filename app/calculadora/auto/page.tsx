@@ -9,6 +9,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { ShareResults } from "@/components/calculadora/share-results";
 import { ResultsDisplay } from "@/components/calculadora/results-display";
+import { Charts } from "@/components/calculadora/charts";
 import { 
   Car, 
   Calculator, 
@@ -29,6 +30,7 @@ export default function CalculadoraAutoPage() {
   const searchParams = useSearchParams();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [viewMode, setViewMode] = useState<'form' | 'results'>('form'); // 'form' o 'results'
   
   const [formData, setFormData] = useState({
     // Datos básicos
@@ -59,6 +61,9 @@ export default function CalculadoraAutoPage() {
     
     // Depreciación
     tasaDepreciacionAnual: "15", // % anual promedio
+    
+    // Inflación
+    tasaInflacion: "3", // % anual
   });
 
   // Cargar datos desde URL params si existen
@@ -84,10 +89,14 @@ export default function CalculadoraAutoPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setShowResults(true);
-    // Scroll to results
-    setTimeout(() => {
-      document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    setViewMode('results'); // Cambiar a vista de resultados
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleEditForm = () => {
+    setViewMode('form');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Cálculos mejorados con explicaciones claras
@@ -129,7 +138,10 @@ export default function CalculadoraAutoPage() {
     // === INVERSIÓN DEL DINERO RESTANTE ===
     const dineroRestante = disponible - precio;
     const tasaInv = parseFloat(formData.tasaInversion) / 100 || 0.08;
+    const tasaInfla = parseFloat(formData.tasaInflacion) / 100 || 0.03;
+    const tasaRealInversion = ((1 + tasaInv) / (1 + tasaInfla)) - 1; // Tasa real descontando inflación
     const inversionRestante = dineroRestante > 0 ? dineroRestante * Math.pow(1 + tasaInv, anos) : 0;
+    const inversionRealRestante = dineroRestante > 0 ? dineroRestante * Math.pow(1 + tasaRealInversion, anos) : 0;
     const gananciaInversion = dineroRestante > 0 ? inversionRestante - dineroRestante : 0;
     
     // === PATRIMONIO NETO CON AUTO ===
@@ -141,6 +153,7 @@ export default function CalculadoraAutoPage() {
     const uberMensual = parseFloat(formData.uberMensual) || 0;
     const totalGastadoUber = uberMensual * 12 * anos;
     const inversionUber = disponible * Math.pow(1 + tasaInv, anos);
+    const inversionRealUber = disponible * Math.pow(1 + tasaRealInversion, anos);
     const gananciaInversionUber = inversionUber - disponible;
     const patrimonioUber = inversionUber;
     
@@ -148,6 +161,7 @@ export default function CalculadoraAutoPage() {
     const transporteMensual = parseFloat(formData.transportePublico) || 0;
     const totalGastadoTransporte = transporteMensual * 12 * anos;
     const inversionTransporte = disponible * Math.pow(1 + tasaInv, anos);
+    const inversionRealTransporte = disponible * Math.pow(1 + tasaRealInversion, anos);
     const gananciaInversionTransporte = inversionTransporte - disponible;
     const patrimonioTransporte = inversionTransporte;
     
@@ -189,6 +203,7 @@ export default function CalculadoraAutoPage() {
         // Inversión
         inversionInicial: Math.max(0, dineroRestante),
         inversionFinal: inversionRestante,
+        inversionRealFinal: inversionRealRestante,
         gananciaInversion,
         
         // Resultado final
@@ -200,6 +215,7 @@ export default function CalculadoraAutoPage() {
         gastoTotal: totalGastadoUber,
         inversionInicial: disponible,
         inversionFinal: inversionUber,
+        inversionRealFinal: inversionRealUber,
         gananciaInversion: gananciaInversionUber,
         patrimonioNeto: patrimonioUber
       },
@@ -208,8 +224,13 @@ export default function CalculadoraAutoPage() {
         gastoTotal: totalGastadoTransporte,
         inversionInicial: disponible,
         inversionFinal: inversionTransporte,
+        inversionRealFinal: inversionRealTransporte,
         gananciaInversion: gananciaInversionTransporte,
         patrimonioNeto: patrimonioTransporte
+      },
+      inflacion: {
+        tasa: tasaInfla * 100,
+        tasaRealInversion: tasaRealInversion * 100
       },
       mejorOpcion,
       diferencias: {
@@ -238,9 +259,9 @@ export default function CalculadoraAutoPage() {
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Formulario */}
-        <div>
+      {/* Vista de Formulario */}
+      {viewMode === 'form' && (
+        <div className="max-w-3xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Datos Básicos */}
             <Card>
@@ -406,11 +427,11 @@ export default function CalculadoraAutoPage() {
                     <div>
                       <NumberInput
                         name="lavadoFrecuencia"
-                        placeholder="4"
+                        placeholder="4 o 0.5"
                         value={formData.lavadoFrecuencia}
                         onChange={handleChange}
                       />
-                      <p className="text-xs text-muted-foreground mt-1">veces/mes</p>
+                      <p className="text-xs text-muted-foreground mt-1">veces/mes (ej: 0.5 = cada 2 meses)</p>
                     </div>
                     <div>
                       <NumberInput
@@ -539,47 +560,69 @@ export default function CalculadoraAutoPage() {
                       Porcentaje que pierde valor el auto cada año (típico: 10-20%)
                     </p>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="tasaInflacion">Inflación Anual (%)</Label>
+                    <NumberInput
+                      id="tasaInflacion"
+                      name="tasaInflacion"
+                      placeholder="3"
+                      value={formData.tasaInflacion}
+                      onChange={handleChange}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Inflación esperada por año (afecta el poder adquisitivo)
+                    </p>
+                  </div>
                 </CardContent>
               )}
             </Card>
 
             <Button type="submit" size="lg" className="w-full gap-2">
               <Calculator className="h-5 w-5" />
-              Calcular Resultados
+              Ver Resultados
             </Button>
           </form>
         </div>
+      )}
 
-        {/* Resultados */}
-        <div id="resultados">
-          {showResults && resultados ? (
-            <div className="space-y-6 sticky top-20">
-              {/* Resultados con explicaciones claras */}
-              <ResultsDisplay 
-                resultados={resultados}
-                anos={formData.anosProyeccion}
-              />
+      {/* Vista de Resultados */}
+      {viewMode === 'results' && showResults && resultados && (
+        <div className="max-w-6xl mx-auto">
+          {/* Botón para volver al formulario */}
+          <div className="mb-6">
+            <Button 
+              onClick={handleEditForm}
+              variant="outline"
+              className="gap-2"
+            >
+              ← Editar Datos
+            </Button>
+          </div>
 
-              {/* Componente de Compartir */}
-              <ShareResults 
-                formData={formData}
-                resultados={resultados}
-                tipo="auto"
-              />
-            </div>
-          ) : (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <Calculator className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="font-semibold mb-2">Completa el formulario</h3>
-                <p className="text-sm text-muted-foreground">
-                  Ingresa tus datos en el formulario de la izquierda para ver los resultados aquí
-                </p>
-              </CardContent>
-            </Card>
-          )}
+          <div className="space-y-6">
+            {/* Gráficos */}
+            <Charts 
+              resultados={resultados}
+              anos={formData.anosProyeccion}
+              formData={formData}
+            />
+
+            {/* Resultados con explicaciones claras */}
+            <ResultsDisplay 
+              resultados={resultados}
+              anos={formData.anosProyeccion}
+            />
+
+            {/* Componente de Compartir */}
+            <ShareResults 
+              formData={formData}
+              resultados={resultados}
+              tipo="auto"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
