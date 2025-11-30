@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { ShareResults } from "@/components/calculadora/share-results";
+import { ResultsDisplay } from "@/components/calculadora/results-display";
 import { 
   Car, 
   Calculator, 
@@ -57,7 +58,7 @@ export default function CalculadoraAutoPage() {
     tasaInversion: "8", // % anual
     
     // Depreciación
-    tasaDepreciacion: "15", // % primer año
+    tasaDepreciacionAnual: "15", // % anual promedio
   });
 
   // Cargar datos desde URL params si existen
@@ -89,13 +90,13 @@ export default function CalculadoraAutoPage() {
     }, 100);
   };
 
-  // Cálculos
+  // Cálculos mejorados con explicaciones claras
   const calcularResultados = () => {
     const precio = parseFloat(formData.precioAuto) || 0;
     const disponible = parseFloat(formData.dineroDisponible) || 0;
     const anos = parseInt(formData.anosProyeccion) || 5;
     
-    // Gastos mensuales del auto
+    // === GASTOS MENSUALES DEL AUTO ===
     const seguroMensual = parseFloat(formData.seguro) || 0;
     const kmMes = parseFloat(formData.combustibleKmMes) || 0;
     const consumo = parseFloat(formData.combustibleConsumo) || 10;
@@ -109,62 +110,108 @@ export default function CalculadoraAutoPage() {
     
     const gastosMensualesAuto = seguroMensual + combustibleMensual + mantenimiento + estacionamiento + lavadoMensual;
     
-    // Gastos anuales
+    // === GASTOS ANUALES ===
     const patente = parseFloat(formData.patente) || 0;
     const reparaciones = parseFloat(formData.reparacionesAnual) || 0;
-    const gastosAnualesAuto = patente + reparaciones;
+    const gastosAnualesAuto = (gastosMensualesAuto * 12) + patente + reparaciones;
     
-    // Total gastado en el auto
-    const totalGastadoAuto = (gastosMensualesAuto * 12 * anos) + (gastosAnualesAuto * anos);
+    // === TOTAL GASTADO EN TODOS LOS AÑOS ===
+    const totalGastadoAuto = gastosAnualesAuto * anos;
     
-    // Depreciación del auto
-    const tasaDepr = parseFloat(formData.tasaDepreciacion) / 100 || 0.15;
+    // === DEPRECIACIÓN DEL AUTO (cada año pierde valor) ===
+    const tasaDepr = parseFloat(formData.tasaDepreciacionAnual) / 100 || 0.15;
     let valorAuto = precio;
     for (let i = 0; i < anos; i++) {
-      valorAuto *= (1 - tasaDepr * (i === 0 ? 1 : 0.8)); // Primera año deprecia más
+      valorAuto *= (1 - tasaDepr); // Cada año pierde el % indicado
     }
+    const depreciacionTotal = precio - valorAuto;
     
-    // Dinero restante invertido (si compra el auto)
+    // === INVERSIÓN DEL DINERO RESTANTE ===
     const dineroRestante = disponible - precio;
     const tasaInv = parseFloat(formData.tasaInversion) / 100 || 0.08;
     const inversionRestante = dineroRestante > 0 ? dineroRestante * Math.pow(1 + tasaInv, anos) : 0;
+    const gananciaInversion = dineroRestante > 0 ? inversionRestante - dineroRestante : 0;
     
-    // Patrimonio neto si compra el auto
-    const patrimonioAuto = valorAuto + inversionRestante - totalGastadoAuto;
+    // === PATRIMONIO NETO CON AUTO ===
+    // Lo que tienes = Valor del auto + Dinero invertido - Gastos totales
+    const patrimonioAuto = valorAuto + inversionRestante;
+    const costoRealAuto = precio + totalGastadoAuto - valorAuto; // Lo que realmente te costó el auto
     
-    // Alternativa: Uber/Taxi
+    // === ALTERNATIVA: UBER ===
     const uberMensual = parseFloat(formData.uberMensual) || 0;
     const totalGastadoUber = uberMensual * 12 * anos;
     const inversionUber = disponible * Math.pow(1 + tasaInv, anos);
-    const patrimonioUber = inversionUber - totalGastadoUber;
+    const gananciaInversionUber = inversionUber - disponible;
+    const patrimonioUber = inversionUber;
     
-    // Alternativa: Transporte público
+    // === ALTERNATIVA: TRANSPORTE PÚBLICO ===
     const transporteMensual = parseFloat(formData.transportePublico) || 0;
     const totalGastadoTransporte = transporteMensual * 12 * anos;
     const inversionTransporte = disponible * Math.pow(1 + tasaInv, anos);
-    const patrimonioTransporte = inversionTransporte - totalGastadoTransporte;
+    const gananciaInversionTransporte = inversionTransporte - disponible;
+    const patrimonioTransporte = inversionTransporte;
+    
+    // === MEJOR OPCIÓN ===
+    const opciones = [
+      { nombre: 'Comprar Auto', patrimonio: patrimonioAuto },
+      { nombre: 'Uber + Invertir', patrimonio: patrimonioUber },
+      { nombre: 'Transporte + Invertir', patrimonio: patrimonioTransporte }
+    ];
+    const mejorOpcion = opciones.reduce((prev, current) => 
+      current.patrimonio > prev.patrimonio ? current : prev
+    );
     
     return {
       auto: {
-        precio,
+        // Inversión inicial
+        precioCompra: precio,
+        dineroRestante: Math.max(0, dineroRestante),
+        
+        // Gastos
+        gastoMensual: gastosMensualesAuto,
+        gastoAnual: gastosAnualesAuto,
+        gastoTotal: totalGastadoAuto,
+        
+        // Desglose gastos mensuales
+        desglose: {
+          seguro: seguroMensual,
+          combustible: combustibleMensual,
+          mantenimiento,
+          estacionamiento,
+          lavado: lavadoMensual
+        },
+        
+        // Depreciación
+        valorInicial: precio,
         valorFinal: valorAuto,
-        gastosRecurrentes: totalGastadoAuto,
-        inversion: inversionRestante,
+        depreciacionTotal,
+        
+        // Inversión
+        inversionInicial: Math.max(0, dineroRestante),
+        inversionFinal: inversionRestante,
+        gananciaInversion,
+        
+        // Resultado final
         patrimonioNeto: patrimonioAuto,
-        gastoMensual: gastosMensualesAuto
+        costoReal: costoRealAuto
       },
       uber: {
+        gastoMensual: uberMensual,
         gastoTotal: totalGastadoUber,
-        inversion: inversionUber,
-        patrimonioNeto: patrimonioUber,
-        gastoMensual: uberMensual
+        inversionInicial: disponible,
+        inversionFinal: inversionUber,
+        gananciaInversion: gananciaInversionUber,
+        patrimonioNeto: patrimonioUber
       },
       transporte: {
+        gastoMensual: transporteMensual,
         gastoTotal: totalGastadoTransporte,
-        inversion: inversionTransporte,
-        patrimonioNeto: patrimonioTransporte,
-        gastoMensual: transporteMensual
+        inversionInicial: disponible,
+        inversionFinal: inversionTransporte,
+        gananciaInversion: gananciaInversionTransporte,
+        patrimonioNeto: patrimonioTransporte
       },
+      mejorOpcion,
       diferencias: {
         autoVsUber: patrimonioAuto - patrimonioUber,
         autoVsTransporte: patrimonioAuto - patrimonioTransporte,
@@ -480,16 +527,16 @@ export default function CalculadoraAutoPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="tasaDepreciacion">Depreciación Primer Año (%)</Label>
+                    <Label htmlFor="tasaDepreciacionAnual">Depreciación Anual (%)</Label>
                     <NumberInput
-                      id="tasaDepreciacion"
-                      name="tasaDepreciacion"
+                      id="tasaDepreciacionAnual"
+                      name="tasaDepreciacionAnual"
                       placeholder="15"
-                      value={formData.tasaDepreciacion}
+                      value={formData.tasaDepreciacionAnual}
                       onChange={handleChange}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Cuánto pierde valor el auto el primer año
+                      Porcentaje que pierde valor el auto cada año (típico: 10-20%)
                     </p>
                   </div>
                 </CardContent>
@@ -507,160 +554,11 @@ export default function CalculadoraAutoPage() {
         <div id="resultados">
           {showResults && resultados ? (
             <div className="space-y-6 sticky top-20">
-              <Card className="border-2 border-primary">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Resultados</CardTitle>
-                  <CardDescription>
-                    Proyección a {formData.anosProyeccion} años
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Escenario 1: Comprar Auto */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Car className="h-5 w-5 text-blue-600" />
-                      <h3 className="font-bold text-lg">Comprar el Auto</h3>
-                    </div>
-                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Valor del auto hoy:</span>
-                        <span className="font-semibold">${resultados.auto.precio.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Valor en {formData.anosProyeccion} años:</span>
-                        <span className="font-semibold">${resultados.auto.valorFinal.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Gastos recurrentes:</span>
-                        <span className="font-semibold text-red-600">-${resultados.auto.gastosRecurrentes.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Dinero restante invertido:</span>
-                        <span className="font-semibold text-emerald-600">+${resultados.auto.inversion.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
-                      </div>
-                      <div className="border-t pt-2 mt-2">
-                        <div className="flex justify-between">
-                          <span className="font-bold">Patrimonio Neto:</span>
-                          <span className={`font-bold text-lg ${resultados.auto.patrimonioNeto >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                            ${resultados.auto.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Gasto mensual promedio: ${resultados.auto.gastoMensual.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Escenario 2: Uber */}
-                  {formData.uberMensual && parseFloat(formData.uberMensual) > 0 && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-emerald-600" />
-                        <h3 className="font-bold text-lg">Invertir + Usar Uber</h3>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Inversión inicial:</span>
-                          <span className="font-semibold">${formData.dineroDisponible}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Inversión en {formData.anosProyeccion} años:</span>
-                          <span className="font-semibold text-emerald-600">+${resultados.uber.inversion.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Gastado en Uber:</span>
-                          <span className="font-semibold text-red-600">-${resultados.uber.gastoTotal.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
-                        </div>
-                        <div className="border-t pt-2 mt-2">
-                          <div className="flex justify-between">
-                            <span className="font-bold">Patrimonio Neto:</span>
-                            <span className={`font-bold text-lg ${resultados.uber.patrimonioNeto >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                              ${resultados.uber.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Gasto mensual: ${resultados.uber.gastoMensual.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Escenario 3: Transporte Público */}
-                  {formData.transportePublico && parseFloat(formData.transportePublico) > 0 && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-purple-600" />
-                        <h3 className="font-bold text-lg">Invertir + Transporte Público</h3>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Inversión inicial:</span>
-                          <span className="font-semibold">${formData.dineroDisponible}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Inversión en {formData.anosProyeccion} años:</span>
-                          <span className="font-semibold text-emerald-600">+${resultados.transporte.inversion.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Gastado en transporte:</span>
-                          <span className="font-semibold text-red-600">-${resultados.transporte.gastoTotal.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
-                        </div>
-                        <div className="border-t pt-2 mt-2">
-                          <div className="flex justify-between">
-                            <span className="font-bold">Patrimonio Neto:</span>
-                            <span className={`font-bold text-lg ${resultados.transporte.patrimonioNeto >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                              ${resultados.transporte.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Gasto mensual: ${resultados.transporte.gastoMensual.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Comparación Final */}
-                  <div className="bg-gradient-to-br from-emerald-500/10 to-blue-500/10 rounded-lg p-4 border-2 border-emerald-500/20">
-                    <h3 className="font-bold mb-3 flex items-center gap-2">
-                      <AlertCircle className="h-5 w-5" />
-                      Conclusión
-                    </h3>
-                    {formData.uberMensual && parseFloat(formData.uberMensual) > 0 && (
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm">Comprar auto vs Uber:</span>
-                          <span className={`font-bold ${resultados.diferencias.autoVsUber >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                            {resultados.diferencias.autoVsUber >= 0 ? '+' : ''}${resultados.diferencias.autoVsUber.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                          </span>
-                        </div>
-                        {resultados.diferencias.autoVsUber < 0 && (
-                          <p className="text-xs text-muted-foreground bg-emerald-500/10 p-2 rounded">
-                            💡 Usar Uber te dejaría <strong>${Math.abs(resultados.diferencias.autoVsUber).toLocaleString(undefined, {maximumFractionDigits: 0})} más</strong> en {formData.anosProyeccion} años
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    {formData.transportePublico && parseFloat(formData.transportePublico) > 0 && (
-                      <div className="space-y-2 mt-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm">Comprar auto vs Transporte:</span>
-                          <span className={`font-bold ${resultados.diferencias.autoVsTransporte >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                            {resultados.diferencias.autoVsTransporte >= 0 ? '+' : ''}${resultados.diferencias.autoVsTransporte.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                          </span>
-                        </div>
-                        {resultados.diferencias.autoVsTransporte < 0 && (
-                          <p className="text-xs text-muted-foreground bg-emerald-500/10 p-2 rounded">
-                            💡 Usar transporte público te dejaría <strong>${Math.abs(resultados.diferencias.autoVsTransporte).toLocaleString(undefined, {maximumFractionDigits: 0})} más</strong> en {formData.anosProyeccion} años
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Resultados con explicaciones claras */}
+              <ResultsDisplay 
+                resultados={resultados}
+                anos={formData.anosProyeccion}
+              />
 
               {/* Componente de Compartir */}
               <ShareResults 
