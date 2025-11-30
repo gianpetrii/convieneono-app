@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { ShareResults } from "@/components/calculadora/share-results";
 import { 
@@ -208,11 +209,10 @@ export default function CalculadoraAutoPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="precioAuto">Precio del Auto ($)</Label>
-                  <Input
+                  <NumberInput
                     id="precioAuto"
                     name="precioAuto"
-                    type="number"
-                    placeholder="20000"
+                    placeholder="20,000"
                     value={formData.precioAuto}
                     onChange={handleChange}
                     required
@@ -221,11 +221,10 @@ export default function CalculadoraAutoPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="dineroDisponible">Dinero Disponible ($)</Label>
-                  <Input
+                  <NumberInput
                     id="dineroDisponible"
                     name="dineroDisponible"
-                    type="number"
-                    placeholder="25000"
+                    placeholder="25,000"
                     value={formData.dineroDisponible}
                     onChange={handleChange}
                     required
@@ -272,10 +271,9 @@ export default function CalculadoraAutoPage() {
                     <Shield className="h-4 w-4" />
                     Seguro Mensual ($)
                   </Label>
-                  <Input
+                  <NumberInput
                     id="seguro"
                     name="seguro"
-                    type="number"
                     placeholder="100"
                     value={formData.seguro}
                     onChange={handleChange}
@@ -289,20 +287,17 @@ export default function CalculadoraAutoPage() {
                   </Label>
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <Input
+                      <NumberInput
                         name="combustibleKmMes"
-                        type="number"
-                        placeholder="1000"
+                        placeholder="1,000"
                         value={formData.combustibleKmMes}
                         onChange={handleChange}
                       />
                       <p className="text-xs text-muted-foreground mt-1">km/mes</p>
                     </div>
                     <div>
-                      <Input
+                      <NumberInput
                         name="combustibleConsumo"
-                        type="number"
-                        step="0.1"
                         placeholder="10"
                         value={formData.combustibleConsumo}
                         onChange={handleChange}
@@ -310,10 +305,8 @@ export default function CalculadoraAutoPage() {
                       <p className="text-xs text-muted-foreground mt-1">L/100km</p>
                     </div>
                     <div>
-                      <Input
+                      <NumberInput
                         name="combustiblePrecio"
-                        type="number"
-                        step="0.01"
                         placeholder="1.5"
                         value={formData.combustiblePrecio}
                         onChange={handleChange}
@@ -328,10 +321,9 @@ export default function CalculadoraAutoPage() {
                     <Wrench className="h-4 w-4" />
                     Mantenimiento Mensual ($)
                   </Label>
-                  <Input
+                  <NumberInput
                     id="mantenimientoMensual"
                     name="mantenimientoMensual"
-                    type="number"
                     placeholder="50"
                     value={formData.mantenimientoMensual}
                     onChange={handleChange}
@@ -346,10 +338,9 @@ export default function CalculadoraAutoPage() {
                     <ParkingCircle className="h-4 w-4" />
                     Estacionamiento Mensual ($)
                   </Label>
-                  <Input
+                  <NumberInput
                     id="estacionamiento"
                     name="estacionamiento"
-                    type="number"
                     placeholder="0"
                     value={formData.estacionamiento}
                     onChange={handleChange}
@@ -366,9 +357,8 @@ export default function CalculadoraAutoPage() {
                   </Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <Input
+                      <NumberInput
                         name="lavadoFrecuencia"
-                        type="number"
                         placeholder="4"
                         value={formData.lavadoFrecuencia}
                         onChange={handleChange}
@@ -376,9 +366,8 @@ export default function CalculadoraAutoPage() {
                       <p className="text-xs text-muted-foreground mt-1">veces/mes</p>
                     </div>
                     <div>
-                      <Input
+                      <NumberInput
                         name="lavadoCosto"
-                        type="number"
                         placeholder="10"
                         value={formData.lavadoCosto}
                         onChange={handleChange}
@@ -401,10 +390,9 @@ export default function CalculadoraAutoPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="patente">Patente/Impuestos Anuales ($)</Label>
-                  <Input
+                  <NumberInput
                     id="patente"
                     name="patente"
-                    type="number"
                     placeholder="500"
                     value={formData.patente}
                     onChange={handleChange}
@@ -413,10 +401,9 @@ export default function CalculadoraAutoPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="reparacionesAnual">Reparaciones Imprevistas Anuales ($)</Label>
-                  <Input
+                  <NumberInput
                     id="reparacionesAnual"
                     name="reparacionesAnual"
-                    type="number"
                     placeholder="300"
                     value={formData.reparacionesAnual}
                     onChange={handleChange}
@@ -439,10 +426,9 @@ export default function CalculadoraAutoPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="uberMensual">Uber/Taxi Mensual ($)</Label>
-                  <Input
+                  <NumberInput
                     id="uberMensual"
                     name="uberMensual"
-                    type="number"
                     placeholder="150"
                     value={formData.uberMensual}
                     onChange={handleChange}
@@ -451,10 +437,9 @@ export default function CalculadoraAutoPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="transportePublico">Transporte Público Mensual ($)</Label>
-                  <Input
+                  <NumberInput
                     id="transportePublico"
                     name="transportePublico"
-                    type="number"
                     placeholder="50"
                     value={formData.transportePublico}
                     onChange={handleChange}
@@ -482,11 +467,9 @@ export default function CalculadoraAutoPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="tasaInversion">Tasa de Inversión Anual (%)</Label>
-                    <Input
+                    <NumberInput
                       id="tasaInversion"
                       name="tasaInversion"
-                      type="number"
-                      step="0.1"
                       placeholder="8"
                       value={formData.tasaInversion}
                       onChange={handleChange}
@@ -498,11 +481,9 @@ export default function CalculadoraAutoPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="tasaDepreciacion">Depreciación Primer Año (%)</Label>
-                    <Input
+                    <NumberInput
                       id="tasaDepreciacion"
                       name="tasaDepreciacion"
-                      type="number"
-                      step="0.1"
                       placeholder="15"
                       value={formData.tasaDepreciacion}
                       onChange={handleChange}
