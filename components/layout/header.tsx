@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/lib/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { LogOut, User, Menu, Calculator } from "lucide-react";
+import { Menu, Calculator } from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
-  const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -47,41 +45,17 @@ export function Header() {
             >
               Ejemplos
             </Link>
-            {user && (
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium transition-colors hover:text-primary"
-              >
-                Mis Comparaciones
-              </Link>
-            )}
+            <Link
+              href="/about"
+              className="text-sm font-medium transition-colors hover:text-primary"
+            >
+              Acerca de
+            </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-
-          {user ? (
-            <div className="hidden md:flex items-center gap-2">
-              <Link href="/profile">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Button variant="ghost" size="icon" onClick={logout}>
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </div>
-          ) : (
-            <div className="hidden md:flex items-center gap-2">
-              <Link href="/login">
-                <Button variant="ghost">Iniciar Sesión</Button>
-              </Link>
-              <Link href="/register">
-                <Button>Registrarse</Button>
-              </Link>
-            </div>
-          )}
 
           <Button
             variant="ghost"
@@ -126,45 +100,20 @@ export function Header() {
             >
               Ejemplos
             </Link>
-            {user ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/profile"
-                  className="text-sm font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Perfil
-                </Link>
-                <Button
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  Cerrar Sesión
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-start">
-                    Iniciar Sesión
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full">Registrarse</Button>
-                </Link>
-              </>
-            )}
+            <Link
+              href="/about"
+              className="text-sm font-medium"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Acerca de
+            </Link>
+            <Link
+              href="/contact"
+              className="text-sm font-medium"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contacto
+            </Link>
           </nav>
         </div>
       )}

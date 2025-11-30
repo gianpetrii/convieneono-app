@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ShareResults } from "@/components/calculadora/share-results";
 import { 
   Car, 
   Calculator, 
@@ -22,6 +24,7 @@ import {
 } from "lucide-react";
 
 export default function CalculadoraAutoPage() {
+  const searchParams = useSearchParams();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showResults, setShowResults] = useState(false);
   
@@ -55,6 +58,19 @@ export default function CalculadoraAutoPage() {
     // Depreciación
     tasaDepreciacion: "15", // % primer año
   });
+
+  // Cargar datos desde URL params si existen
+  useEffect(() => {
+    const params: any = {};
+    searchParams.forEach((value, key) => {
+      params[key] = value;
+    });
+    
+    if (Object.keys(params).length > 0) {
+      setFormData(prev => ({ ...prev, ...params }));
+      setShowResults(true);
+    }
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({
@@ -664,6 +680,13 @@ export default function CalculadoraAutoPage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Componente de Compartir */}
+              <ShareResults 
+                formData={formData}
+                resultados={resultados}
+                tipo="auto"
+              />
             </div>
           ) : (
             <Card className="border-dashed">

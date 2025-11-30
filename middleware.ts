@@ -1,19 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Rutas que requieren autenticación
-const protectedRoutes = ["/dashboard", "/profile", "/settings"];
-
-// Rutas que solo pueden acceder usuarios no autenticados
-const authRoutes = ["/login", "/register"];
-
+// Middleware simplificado - ConvieneONo no requiere autenticación
+// Todas las calculadoras son públicas y de acceso libre
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Por ahora, este middleware es básico
-  // La protección real de rutas se hace en el cliente con useAuth
-  // En producción, deberías usar Firebase Admin SDK para verificar tokens
-
+  // Por ahora solo pasamos las requests sin modificar
+  // En el futuro podríamos agregar analytics, rate limiting, etc.
   return NextResponse.next();
 }
 

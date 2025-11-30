@@ -83,30 +83,32 @@ export function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Cuenta</h4>
+            <h4 className="text-sm font-semibold">Recursos</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  href="/login"
+                <a
+                  href="https://github.com/gianpetrii/convieneono-app"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Iniciar Sesión
+                  GitHub
+                </a>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Cómo funciona
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/register"
+                  href="/ejemplos"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Registrarse
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Mis Comparaciones
+                  Casos de uso
                 </Link>
               </li>
             </ul>
