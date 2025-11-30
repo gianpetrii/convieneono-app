@@ -8,7 +8,7 @@ import {
   Eye, 
   DollarSign,
   Car,
-  Home,
+  Home as HomeIcon,
   PiggyBank,
   BarChart3
 } from "lucide-react";
@@ -46,7 +46,7 @@ export default function Home() {
             </Link>
             <Link href="/calculadora/departamento">
               <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto">
-                <Home className="h-5 w-5" />
+                <HomeIcon className="h-5 w-5" />
                 Calcular Departamento
               </Button>
             </Link>
@@ -216,7 +216,7 @@ export default function Home() {
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500/10">
-                  <Home className="h-6 w-6 text-blue-600" />
+                  <HomeIcon className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold mb-2">Departamento de $200,000</h3>
