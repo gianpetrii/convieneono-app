@@ -4,8 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -66,22 +64,6 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
     return data;
   };
 
-  // Datos para el gráfico de barras (comparación final)
-  const comparisonData = [
-    {
-      opcion: 'Comprar Auto',
-      patrimonio: resultados.auto.patrimonioNeto,
-    },
-    ...(resultados.uber.gastoMensual > 0 ? [{
-      opcion: 'Uber + Invertir',
-      patrimonio: resultados.uber.patrimonioNeto,
-    }] : []),
-    ...(resultados.transporte.gastoMensual > 0 ? [{
-      opcion: 'Transporte + Invertir',
-      patrimonio: resultados.transporte.patrimonioNeto,
-    }] : []),
-  ];
-
   const timelineData = generateTimelineData();
 
   const formatCurrency = (value: number) => {
@@ -107,94 +89,61 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Gráfico de Línea: Evolución del Patrimonio */}
-      <Card>
-        <CardHeader>
-          <CardTitle>📈 Evolución del Patrimonio en el Tiempo</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[400px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timelineData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="año" 
-                  label={{ value: 'Años', position: 'insideBottom', offset: -5 }}
-                />
-                <YAxis 
-                  tickFormatter={formatCurrency}
-                  label={{ value: 'Patrimonio', angle: -90, position: 'insideLeft' }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
+    <Card>
+      <CardHeader>
+        <CardTitle>📈 Evolución del Patrimonio en el Tiempo</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={timelineData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="año" 
+                label={{ value: 'Años', position: 'insideBottom', offset: -5 }}
+              />
+              <YAxis 
+                tickFormatter={formatCurrency}
+                label={{ value: 'Patrimonio', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="Comprar Auto" 
+                stroke="#3b82f6" 
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+              {resultados.uber.gastoMensual > 0 && (
                 <Line 
                   type="monotone" 
-                  dataKey="Comprar Auto" 
-                  stroke="#3b82f6" 
+                  dataKey="Uber + Invertir" 
+                  stroke="#10b981" 
                   strokeWidth={2}
                   dot={{ r: 4 }}
                   activeDot={{ r: 6 }}
                 />
-                {resultados.uber.gastoMensual > 0 && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="Uber + Invertir" 
-                    stroke="#10b981" 
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                )}
-                {resultados.transporte.gastoMensual > 0 && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="Transporte + Invertir" 
-                    stroke="#8b5cf6" 
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                )}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-sm text-muted-foreground mt-4 text-center">
-            💡 Este gráfico muestra cómo evoluciona tu patrimonio año tras año en cada escenario
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Gráfico de Barras: Comparación Final */}
-      <Card>
-        <CardHeader>
-          <CardTitle>📊 Comparación Final a {anos} Años</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="opcion" />
-                <YAxis tickFormatter={formatCurrency} />
-                <Tooltip 
-                  formatter={(value: number) => `$${value.toLocaleString()}`}
-                  contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
+              )}
+              {resultados.transporte.gastoMensual > 0 && (
+                <Line 
+                  type="monotone" 
+                  dataKey="Transporte + Invertir" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
                 />
-                <Bar 
-                  dataKey="patrimonio" 
-                  fill="#10b981"
-                  radius={[8, 8, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-sm text-muted-foreground mt-4 text-center">
-            💡 Comparación directa del patrimonio final que tendrías en cada escenario
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+              )}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="text-sm text-muted-foreground mt-4 text-center">
+          💡 Este gráfico muestra cómo evoluciona tu patrimonio año tras año en cada escenario
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
