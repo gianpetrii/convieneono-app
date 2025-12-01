@@ -89,11 +89,11 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
   };
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>📈 Evolución del Patrimonio en el Tiempo</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 flex flex-col">
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={timelineData}>

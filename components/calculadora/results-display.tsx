@@ -14,19 +14,20 @@ import {
 interface ResultsDisplayProps {
   resultados: any;
   anos: string;
+  onlyRecommendation?: boolean;
 }
 
-export function ResultsDisplay({ resultados, anos }: ResultsDisplayProps) {
+export function ResultsDisplay({ resultados, anos, onlyRecommendation }: ResultsDisplayProps) {
   const formatMoney = (value: number) => {
     return `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   };
 
   const { auto, uber, transporte, mejorOpcion } = resultados;
 
-  return (
-    <div className="space-y-6">
-      {/* Resumen Ejecutivo */}
-      <Card className="border-2 border-primary">
+  // Si solo queremos la recomendación
+  if (onlyRecommendation) {
+    return (
+      <Card className="border-2 border-primary h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-6 w-6 text-emerald-600" />
@@ -63,9 +64,20 @@ export function ResultsDisplay({ resultados, anos }: ResultsDisplayProps) {
           </div>
         </CardContent>
       </Card>
+    );
+  }
 
-      {/* Grid de 2 columnas para las opciones */}
-      <div className="grid md:grid-cols-2 gap-6">
+  // Vista completa con detalles
+  return (
+    <div className="space-y-6">
+      {/* Grid de 2 o 3 columnas para las opciones según cuántas haya */}
+      <div className={`grid gap-6 ${
+        uber.gastoMensual > 0 && transporte.gastoMensual > 0 
+          ? 'md:grid-cols-3' 
+          : uber.gastoMensual > 0 || transporte.gastoMensual > 0
+            ? 'md:grid-cols-2'
+            : 'md:grid-cols-1'
+      }`}>
         {/* Opción 1: Comprar Auto */}
         <Card className="flex flex-col">
         <CardHeader className="pb-3">

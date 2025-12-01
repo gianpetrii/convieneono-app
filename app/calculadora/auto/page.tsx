@@ -601,17 +601,28 @@ export default function CalculadoraAutoPage() {
           </div>
 
           <div className="space-y-6">
-            {/* Gráficos */}
-            <Charts 
-              resultados={resultados}
-              anos={formData.anosProyeccion}
-              formData={formData}
-            />
+            {/* Gráfico y Recomendación en 2 columnas */}
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Gráficos */}
+              <Charts 
+                resultados={resultados}
+                anos={formData.anosProyeccion}
+                formData={formData}
+              />
 
-            {/* Resultados con explicaciones claras */}
+              {/* Recomendación */}
+              <ResultsDisplay 
+                resultados={resultados}
+                anos={formData.anosProyeccion}
+                onlyRecommendation={true}
+              />
+            </div>
+
+            {/* Resultados detallados */}
             <ResultsDisplay 
               resultados={resultados}
               anos={formData.anosProyeccion}
+              onlyRecommendation={false}
             />
 
             {/* Componente de Compartir */}
