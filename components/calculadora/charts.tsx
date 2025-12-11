@@ -21,6 +21,10 @@ interface ChartsProps {
 export function Charts({ resultados, anos, formData }: ChartsProps) {
   const anosNum = parseInt(anos);
   
+  // Obtener valores de gastos mensuales
+  const uberMensual = parseFloat(formData.uberMensual) || 0;
+  const transporteMensual = parseFloat(formData.transportePublico) || 0;
+  
   // Generar datos para el gráfico de línea (patrimonio a lo largo del tiempo)
   const generateTimelineData = () => {
     const data = [];
@@ -30,8 +34,6 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
     const tasaDepr = parseFloat(formData.tasaDepreciacionAnual) / 100 || 0.15;
     const gastoAnual = resultados.auto.gastoAnual;
     const dineroRestante = Math.max(0, disponible - precio);
-    const uberMensual = parseFloat(formData.uberMensual) || 0;
-    const transporteMensual = parseFloat(formData.transportePublico) || 0;
 
     for (let year = 0; year <= anosNum; year++) {
       // Comprar Auto
@@ -40,25 +42,28 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
         valorAuto *= (1 - tasaDepr);
       }
       const inversionAuto = dineroRestante * Math.pow(1 + tasaInv, year);
-      const gastosAcumuladosAuto = gastoAnual * year;
       const patrimonioAuto = valorAuto + inversionAuto;
 
-      // Uber + Invertir
+      // Uber + Invertir (todo el dinero invertido)
       const inversionUber = disponible * Math.pow(1 + tasaInv, year);
-      const gastosUber = uberMensual * 12 * year;
-      const patrimonioUber = inversionUber;
 
-      // Transporte + Invertir
+      // Transporte + Invertir (todo el dinero invertido)
       const inversionTransporte = disponible * Math.pow(1 + tasaInv, year);
-      const gastosTransporte = transporteMensual * 12 * year;
-      const patrimonioTransporte = inversionTransporte;
 
-      data.push({
+      const dataPoint: any = {
         año: year,
         'Comprar Auto': Math.round(patrimonioAuto),
-        'Uber + Invertir': uberMensual > 0 ? Math.round(patrimonioUber) : null,
-        'Transporte + Invertir': transporteMensual > 0 ? Math.round(patrimonioTransporte) : null,
-      });
+      };
+      
+      if (uberMensual > 0) {
+        dataPoint['Uber + Invertir'] = Math.round(inversionUber);
+      }
+      
+      if (transporteMensual > 0) {
+        dataPoint['Transporte + Invertir'] = Math.round(inversionTransporte);
+      }
+
+      data.push(dataPoint);
     }
 
     return data;
@@ -116,7 +121,7 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
               />
-              {resultados.uber.gastoMensual > 0 && (
+              {uberMensual > 0 && (
                 <Line 
                   type="monotone" 
                   dataKey="Uber + Invertir" 
@@ -126,7 +131,7 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
                   activeDot={{ r: 6 }}
                 />
               )}
-              {resultados.transporte.gastoMensual > 0 && (
+              {transporteMensual > 0 && (
                 <Line 
                   type="monotone" 
                   dataKey="Transporte + Invertir" 

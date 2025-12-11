@@ -26,41 +26,79 @@ export function ResultsDisplay({ resultados, anos, onlyRecommendation }: Results
 
   // Si solo queremos la recomendación
   if (onlyRecommendation) {
+    // Determinar cuál es la mejor y peor opción para colorear
+    const opciones = [
+      { nombre: 'Comprar Auto', patrimonio: auto.patrimonioNeto, key: 'auto' },
+      ...(uber.gastoMensual > 0 ? [{ nombre: 'Uber + Invertir', patrimonio: uber.patrimonioNeto, key: 'uber' }] : []),
+      ...(transporte.gastoMensual > 0 ? [{ nombre: 'Transporte + Invertir', patrimonio: transporte.patrimonioNeto, key: 'transporte' }] : []),
+    ];
+    
+    const mejorPatrimonio = Math.max(...opciones.map(o => o.patrimonio));
+    const peorPatrimonio = Math.min(...opciones.map(o => o.patrimonio));
+
+    const getColorClass = (patrimonio: number) => {
+      if (patrimonio === mejorPatrimonio) return 'bg-emerald-500/20 border-2 border-emerald-500 text-emerald-700';
+      if (patrimonio === peorPatrimonio && opciones.length > 2) return 'bg-red-500/10 border border-red-300 text-red-700';
+      return 'bg-muted/50 border border-muted-foreground/20';
+    };
+
     return (
-      <Card className="border-2 border-primary h-full">
-        <CardHeader>
+      <Card className="border-2 border-primary h-full flex flex-col">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
             Recomendación
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="bg-gradient-to-br from-emerald-500/10 to-blue-500/10 rounded-lg p-4">
-            <p className="text-xl font-bold mb-1">
+        <CardContent className="flex-1 flex flex-col">
+          {/* Recomendación principal */}
+          <div className="bg-gradient-to-br from-emerald-500/10 to-blue-500/10 rounded-lg p-3 mb-4">
+            <p className="text-lg font-bold mb-1">
               {mejorOpcion.nombre}
             </p>
-            <p className="text-sm text-muted-foreground mb-3">
-              Esta opción te deja con {formatMoney(mejorOpcion.patrimonio)} en {anos} años
+            <p className="text-xs text-muted-foreground mb-2">
+              Te deja con {formatMoney(mejorOpcion.patrimonio)} en {anos} años
             </p>
             
             {mejorOpcion.nombre === 'Comprar Auto' ? (
-              <div className="text-sm">
+              <div className="text-xs">
                 <p className="font-medium mb-1">✅ El auto te conviene porque:</p>
-                <ul className="ml-4 space-y-0.5 text-xs">
-                  <li>• Terminas con más patrimonio que las alternativas</li>
-                  <li>• El valor residual del auto compensa los gastos</li>
+                <ul className="ml-3 space-y-0.5 text-muted-foreground">
+                  <li>• Terminas con más patrimonio</li>
+                  <li>• El valor residual compensa gastos</li>
                 </ul>
               </div>
             ) : (
-              <div className="text-sm">
-                <p className="font-medium mb-1">✅ No comprar el auto te conviene porque:</p>
-                <ul className="ml-4 space-y-0.5 text-xs">
+              <div className="text-xs">
+                <p className="font-medium mb-1">✅ No comprar te conviene porque:</p>
+                <ul className="ml-3 space-y-0.5 text-muted-foreground">
                   <li>• Ahorras {formatMoney(Math.abs(resultados.diferencias.autoVsUber || resultados.diferencias.autoVsTransporte))} vs comprar</li>
-                  <li>• Tu dinero genera rendimientos en inversiones</li>
-                  <li>• Evitas depreciación y gastos de mantenimiento</li>
+                  <li>• Tu dinero genera rendimientos</li>
                 </ul>
               </div>
             )}
+          </div>
+
+          {/* Comparación Final con colores */}
+          <div className="mt-auto">
+            <h4 className="text-sm font-semibold mb-2 flex items-center gap-1">
+              <AlertCircle className="h-4 w-4" />
+              Comparación Final
+            </h4>
+            <div className="space-y-2">
+              {opciones.map((opcion) => (
+                <div 
+                  key={opcion.key}
+                  className={`flex justify-between items-center p-2.5 rounded-lg ${getColorClass(opcion.patrimonio)}`}
+                >
+                  <span className="text-xs font-medium">{opcion.nombre}</span>
+                  <span className="font-bold text-sm">{formatMoney(opcion.patrimonio)}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              🟢 Mejor opción · 🔴 Peor opción
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -214,6 +252,25 @@ export function ResultsDisplay({ resultados, anos, onlyRecommendation }: Results
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 flex-1">
+              {/* Comparación vs Auto */}
+              <div>
+                <h4 className="font-semibold text-sm mb-2">📊 Comparación vs Auto</h4>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span>Ahorro mensual vs auto:</span>
+                    <span className={`font-semibold ${auto.gastoMensual - uber.gastoMensual > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {auto.gastoMensual - uber.gastoMensual > 0 ? '+' : ''}{formatMoney(auto.gastoMensual - uber.gastoMensual)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Diferencia patrimonio:</span>
+                    <span className={`font-semibold ${resultados.diferencias.autoVsUber < 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {resultados.diferencias.autoVsUber < 0 ? '+' : ''}{formatMoney(Math.abs(resultados.diferencias.autoVsUber))}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <h4 className="font-semibold text-sm mb-2">🚗 Gasto en Uber</h4>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
@@ -251,15 +308,15 @@ export function ResultsDisplay({ resultados, anos, onlyRecommendation }: Results
 
               <div className="border-t pt-3 mt-auto">
                 <div className="bg-gradient-to-br from-emerald-500/10 to-blue-500/10 rounded-lg p-3">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mb-2">
                     <span className="font-bold text-sm">Patrimonio Total:</span>
                     <span className="font-bold text-xl text-emerald-600">
                       {formatMoney(uber.patrimonioNeto)}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    💡 Todo tu dinero invertido generando rendimientos
-                  </p>
+                  <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                    <p>💡 Todo tu dinero invertido generando rendimientos</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -276,6 +333,25 @@ export function ResultsDisplay({ resultados, anos, onlyRecommendation }: Results
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 flex-1">
+              {/* Comparación vs Auto */}
+              <div>
+                <h4 className="font-semibold text-sm mb-2">📊 Comparación vs Auto</h4>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span>Ahorro mensual vs auto:</span>
+                    <span className={`font-semibold ${auto.gastoMensual - transporte.gastoMensual > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {auto.gastoMensual - transporte.gastoMensual > 0 ? '+' : ''}{formatMoney(auto.gastoMensual - transporte.gastoMensual)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Diferencia patrimonio:</span>
+                    <span className={`font-semibold ${resultados.diferencias.autoVsTransporte < 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {resultados.diferencias.autoVsTransporte < 0 ? '+' : ''}{formatMoney(Math.abs(resultados.diferencias.autoVsTransporte))}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <h4 className="font-semibold text-sm mb-2">🚌 Gasto en Transporte</h4>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
@@ -313,51 +389,21 @@ export function ResultsDisplay({ resultados, anos, onlyRecommendation }: Results
 
               <div className="border-t pt-3 mt-auto">
                 <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-lg p-3">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mb-2">
                     <span className="font-bold text-sm">Patrimonio Total:</span>
                     <span className="font-bold text-xl text-emerald-600">
                       {formatMoney(transporte.patrimonioNeto)}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    💡 Opción más económica en transporte
-                  </p>
+                  <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                    <p>💡 Opción más económica en transporte</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
       </div>
-
-      {/* Comparación Final */}
-      <Card className="border-2 border-emerald-500/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <AlertCircle className="h-5 w-5" />
-            Comparación Final
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-3">
-            <div className="flex flex-col items-center justify-center p-3 bg-muted/50 rounded-lg">
-              <span className="text-xs text-muted-foreground mb-1">Comprar Auto</span>
-              <span className="font-bold text-lg">{formatMoney(auto.patrimonioNeto)}</span>
-            </div>
-            {uber.gastoMensual > 0 && (
-              <div className="flex flex-col items-center justify-center p-3 bg-muted/50 rounded-lg">
-                <span className="text-xs text-muted-foreground mb-1">Uber + Invertir</span>
-                <span className="font-bold text-lg">{formatMoney(uber.patrimonioNeto)}</span>
-              </div>
-            )}
-            {transporte.gastoMensual > 0 && (
-              <div className="flex flex-col items-center justify-center p-3 bg-muted/50 rounded-lg">
-                <span className="text-xs text-muted-foreground mb-1">Transporte + Invertir</span>
-                <span className="font-bold text-lg">{formatMoney(transporte.patrimonioNeto)}</span>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
