@@ -18,7 +18,7 @@ export default function AboutPage() {
           </div>
           <h1 className="text-4xl font-bold">Acerca de ConvieneONo</h1>
           <p className="text-lg text-muted-foreground">
-            Ayudamos a las personas a tomar decisiones financieras más inteligentes 
+            Ayudo a las personas a tomar decisiones financieras más inteligentes 
             mostrándoles el costo real de sus grandes compras.
           </p>
         </div>
@@ -27,7 +27,7 @@ export default function AboutPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Nuestra Misión
+              Mi Misión
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -43,7 +43,7 @@ export default function AboutPage() {
               financiera.
             </p>
             <p className="font-semibold">
-              Creamos ConvieneONo para que tú también puedas ver el panorama completo antes 
+              Creé ConvieneONo para que tú también puedas ver el panorama completo antes 
               de tomar decisiones financieras importantes.
             </p>
           </CardContent>
@@ -97,7 +97,7 @@ export default function AboutPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Nuestra metodología es simple pero poderosa:
+              Mi metodología es simple pero poderosa:
             </p>
             <ol className="space-y-3 ml-4">
               <li className="flex items-start gap-3">
@@ -144,26 +144,26 @@ export default function AboutPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5 text-primary" />
-              Nuestros Valores
+              Mis Valores
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               <li>
-                <strong className="text-primary">Transparencia:</strong> Mostramos todos 
+                <strong className="text-primary">Transparencia:</strong> Muestro todos 
                 los cálculos. Sin trucos, sin letra chica.
               </li>
               <li>
                 <strong className="text-primary">Simplicidad:</strong> Finanzas personales 
-                no tiene que ser complicado. Lo hacemos fácil de entender.
+                no tiene que ser complicado. Lo hago fácil de entender.
               </li>
               <li>
-                <strong className="text-primary">Gratuito:</strong> Creemos que todos 
+                <strong className="text-primary">Gratuito:</strong> Creo que todos 
                 merecen acceso a herramientas para tomar mejores decisiones financieras.
               </li>
               <li>
-                <strong className="text-primary">Sin sesgos:</strong> No vendemos autos, 
-                departamentos ni productos financieros. Solo te mostramos los números.
+                <strong className="text-primary">Sin sesgos:</strong> No vendo autos, 
+                departamentos ni productos financieros. Solo te muestro los números.
               </li>
             </ul>
           </CardContent>

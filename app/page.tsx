@@ -182,65 +182,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Examples Section */}
-      <section className="container py-20 md:py-32 border-t">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Casos reales</h2>
-          <p className="text-muted-foreground max-w-[600px] mx-auto">
-            Mira cómo otros han usado ConvieneONo para tomar mejores decisiones
-          </p>
-        </div>
-
-        <div className="mx-auto max-w-4xl grid gap-6 md:grid-cols-2">
-          <Card className="border-2">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-                  <Car className="h-6 w-6 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">Auto de $20,000</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Martín tenía $25,000 ahorrados y quería comprar un auto. 
-                    Descubrió que en 5 años, invertir le dejaría $8,500 más.
-                  </p>
-                  <Link href="/ejemplos" className="text-sm text-primary hover:underline">
-                    Ver caso completo →
-                  </Link>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500/10">
-                  <HomeIcon className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">Departamento de $200,000</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Laura comparó comprar vs alquilar. En 10 años, comprar le generaría 
-                    $45,000 más de patrimonio.
-                  </p>
-                  <Link href="/ejemplos" className="text-sm text-primary hover:underline">
-                    Ver caso completo →
-                  </Link>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="text-center mt-8">
-          <Link href="/ejemplos">
-            <Button variant="outline" size="lg">
-              Ver más ejemplos
-            </Button>
-          </Link>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="border-t bg-gradient-to-br from-emerald-500/10 via-blue-500/10 to-purple-500/10">
@@ -259,11 +200,6 @@ export default function Home() {
                 <Calculator className="h-5 w-5" />
                 Empezar ahora gratis
                 <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/ejemplos">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                Ver ejemplos
               </Button>
             </Link>
           </div>

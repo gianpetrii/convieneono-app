@@ -33,14 +33,6 @@ export function Footer() {
                   Departamento vs Alquiler
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/ejemplos"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Ver Ejemplos
-                </Link>
-              </li>
             </ul>
           </div>
 
