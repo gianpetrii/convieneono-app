@@ -11,9 +11,9 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+      <div className="container grid h-16 grid-cols-3 items-center">
         {/* Logo - Left */}
-        <div className="flex items-center">
+        <div className="flex items-center justify-start">
           <Link href="/" className="flex items-center space-x-2">
             <Calculator className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -23,7 +23,7 @@ export function Header() {
         </div>
 
         {/* Navigation - Center */}
-        <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
+        <nav className="hidden md:flex items-center gap-6 justify-center">
           <Link
             href="/calculadora/auto"
             className="text-sm font-medium transition-colors hover:text-primary"
@@ -45,7 +45,7 @@ export function Header() {
         </nav>
 
         {/* Theme Toggle & Mobile Menu - Right */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-end">
           <ThemeToggle />
 
           <Button
