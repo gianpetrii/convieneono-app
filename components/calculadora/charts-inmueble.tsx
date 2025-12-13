@@ -12,84 +12,64 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-interface ChartsProps {
+interface ChartsInmuebleProps {
   resultados: any;
   anos: string;
   formData: any;
 }
 
-export function Charts({ resultados, anos, formData }: ChartsProps) {
+export function ChartsInmueble({ resultados, anos, formData }: ChartsInmuebleProps) {
   const anosNum = parseInt(anos);
   
   // Obtener valores de gastos mensuales
-  const uberMensual = parseFloat(formData.uberMensual) || 0;
-  const transporteMensual = parseFloat(formData.transportePublico) || 0;
+  const alquilerMensual = parseFloat(formData.alquilerMensual) || 0;
   const invertirDiferencial = formData.invertirDiferencial === "true";
   
   // Generar datos para el gráfico de línea (patrimonio a lo largo del tiempo)
   const generateTimelineData = () => {
     const data = [];
-    const precio = parseFloat(formData.precioAuto) || 0;
+    const precio = parseFloat(formData.precioInmueble) || 0;
     const disponible = parseFloat(formData.dineroDisponible) || 0;
     const tasaInv = parseFloat(formData.tasaInversion) / 100 || 0.08;
-    const tasaDepr = parseFloat(formData.tasaDepreciacionAnual) / 100 || 0.15;
-    const gastoAnual = resultados.auto.gastoAnual;
-    const dineroRestante = Math.max(0, disponible - precio);
+    const tasaAprec = parseFloat(formData.tasaApreciacion) / 100 || 0.03;
+    const gastoAnual = resultados.inmueble.gastoAnual;
+    const gastosIniciales = resultados.inmueble.gastosIniciales.total;
+    const inversionTotal = precio + gastosIniciales;
+    const dineroRestante = Math.max(0, disponible - inversionTotal);
 
     for (let year = 0; year <= anosNum; year++) {
-      // Comprar Auto
-      let valorAuto = precio;
+      // Comprar Inmueble
+      let valorInmueble = precio;
       for (let i = 0; i < year; i++) {
-        valorAuto *= (1 - tasaDepr);
+        valorInmueble *= (1 + tasaAprec); // El inmueble GANA valor
       }
-      const inversionAuto = dineroRestante * Math.pow(1 + tasaInv, year);
-      const patrimonioAuto = valorAuto + inversionAuto;
+      const inversionInmueble = dineroRestante * Math.pow(1 + tasaInv, year);
+      const patrimonioInmueble = valorInmueble + inversionInmueble;
 
-      // Uber + Invertir - CORREGIDO: restar gastos acumulados + invertir diferencial
-      let inversionUber = disponible * Math.pow(1 + tasaInv, year);
-      const gastosUberAcumulados = uberMensual * 12 * year;
+      // Alquilar + Invertir - restar gastos acumulados + invertir diferencial
+      let inversionAlquiler = disponible * Math.pow(1 + tasaInv, year);
+      const gastosAlquilerAcumulados = alquilerMensual * 12 * year;
       
       // Si se invierte el diferencial, agregar inversión de aportes mensuales
       if (invertirDiferencial && year > 0) {
-        const diferencialUber = Math.max(0, gastoAnual / 12 - uberMensual);
-        if (diferencialUber > 0) {
+        const diferencialAlquiler = Math.max(0, gastoAnual / 12 - alquilerMensual);
+        if (diferencialAlquiler > 0) {
           const meses = year * 12;
           const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
-          const inversionDiferencial = diferencialUber * (Math.pow(1 + tasaMensual, meses) - 1) / tasaMensual;
-          inversionUber += inversionDiferencial;
+          const inversionDiferencial = diferencialAlquiler * (Math.pow(1 + tasaMensual, meses) - 1) / tasaMensual;
+          inversionAlquiler += inversionDiferencial;
         }
       }
       
-      const patrimonioUber = inversionUber - gastosUberAcumulados;
-
-      // Transporte + Invertir - CORREGIDO: restar gastos acumulados + invertir diferencial
-      let inversionTransporte = disponible * Math.pow(1 + tasaInv, year);
-      const gastosTransporteAcumulados = transporteMensual * 12 * year;
-      
-      // Si se invierte el diferencial, agregar inversión de aportes mensuales
-      if (invertirDiferencial && year > 0) {
-        const diferencialTransporte = Math.max(0, gastoAnual / 12 - transporteMensual);
-        if (diferencialTransporte > 0) {
-          const meses = year * 12;
-          const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
-          const inversionDiferencial = diferencialTransporte * (Math.pow(1 + tasaMensual, meses) - 1) / tasaMensual;
-          inversionTransporte += inversionDiferencial;
-        }
-      }
-      
-      const patrimonioTransporte = inversionTransporte - gastosTransporteAcumulados;
+      const patrimonioAlquiler = inversionAlquiler - gastosAlquilerAcumulados;
 
       const dataPoint: any = {
         año: year,
-        'Comprar Auto': Math.round(patrimonioAuto),
+        'Comprar Inmueble': Math.round(patrimonioInmueble),
       };
       
-      if (uberMensual > 0) {
-        dataPoint['Uber + Invertir'] = Math.round(patrimonioUber);
-      }
-      
-      if (transporteMensual > 0) {
-        dataPoint['Transporte + Invertir'] = Math.round(patrimonioTransporte);
+      if (alquilerMensual > 0) {
+        dataPoint['Alquilar + Invertir'] = Math.round(patrimonioAlquiler);
       }
 
       data.push(dataPoint);
@@ -144,27 +124,17 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
               <Legend />
               <Line 
                 type="monotone" 
-                dataKey="Comprar Auto" 
+                dataKey="Comprar Inmueble" 
                 stroke="#3b82f6" 
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
               />
-              {uberMensual > 0 && (
+              {alquilerMensual > 0 && (
                 <Line 
                   type="monotone" 
-                  dataKey="Uber + Invertir" 
+                  dataKey="Alquilar + Invertir" 
                   stroke="#10b981" 
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              )}
-              {transporteMensual > 0 && (
-                <Line 
-                  type="monotone" 
-                  dataKey="Transporte + Invertir" 
-                  stroke="#8b5cf6" 
                   strokeWidth={2}
                   dot={{ r: 4 }}
                   activeDot={{ r: 6 }}

@@ -42,6 +42,12 @@ export function Header() {
           >
             Acerca de
           </Link>
+          <Link
+            href="/contact"
+            className="text-sm font-medium transition-colors hover:text-primary"
+          >
+            Contacto
+          </Link>
         </nav>
 
         {/* Theme Toggle & Mobile Menu - Right */}

@@ -49,6 +49,23 @@ export function ShareResults({ formData, resultados, tipo }: ShareResultsProps) 
 Calcula tu caso en ConvieneONo 👇`;
     }
     
+    if (tipo === "departamento") {
+      const precio = parseFloat(formData.precioInmueble || "0");
+      const mejorOpcion = resultados.inmueble.patrimonioNeto > resultados.alquiler.patrimonioNeto 
+        ? "comprar el inmueble" 
+        : "alquilar e invertir";
+      
+      return `🏠 Calculé si me conviene comprar un inmueble de $${precio.toLocaleString()}
+
+📊 Resultado a ${anos} años:
+• Comprar inmueble: $${resultados.inmueble.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}
+• Alquilar + Invertir: $${resultados.alquiler.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}
+
+💡 Me conviene más: ${mejorOpcion}
+
+Calcula tu caso en ConvieneONo 👇`;
+    }
+    
     return `Calculé mi decisión financiera en ConvieneONo`;
   };
 

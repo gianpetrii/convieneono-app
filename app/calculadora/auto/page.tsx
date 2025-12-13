@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ShareResults } from "@/components/calculadora/share-results";
 import { ResultsDisplay } from "@/components/calculadora/results-display";
 import { Charts } from "@/components/calculadora/charts";
@@ -23,8 +24,15 @@ import {
   FileText,
   AlertCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  HelpCircle
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function CalculadoraAutoPage() {
   const searchParams = useSearchParams();
@@ -55,6 +63,7 @@ export default function CalculadoraAutoPage() {
     // Alternativas
     uberMensual: "",
     transportePublico: "",
+    invertirDiferencial: "true", // Invertir el ahorro mensual de no tener auto
     
     // Inversión
     tasaInversion: "8", // % anual
@@ -152,18 +161,48 @@ export default function CalculadoraAutoPage() {
     // === ALTERNATIVA: UBER ===
     const uberMensual = parseFloat(formData.uberMensual) || 0;
     const totalGastadoUber = uberMensual * 12 * anos;
-    const inversionUber = disponible * Math.pow(1 + tasaInv, anos);
+    const invertirDiferencial = formData.invertirDiferencial === "true";
+    
+    // Calcular diferencial de gastos (lo que ahorras al no tener auto)
+    const diferencialUber = Math.max(0, gastosMensualesAuto - uberMensual);
+    
+    let inversionUber = disponible * Math.pow(1 + tasaInv, anos);
+    let inversionDiferencialUber = 0;
+    
+    // Si se invierte el diferencial, calcular inversión de aportes mensuales
+    if (invertirDiferencial && diferencialUber > 0) {
+      // Fórmula de valor futuro de anualidad: FV = PMT × [((1 + r)^n - 1) / r]
+      const mesesTotales = anos * 12;
+      const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
+      inversionDiferencialUber = diferencialUber * (Math.pow(1 + tasaMensual, mesesTotales) - 1) / tasaMensual;
+    }
+    
+    const inversionTotalUber = inversionUber + inversionDiferencialUber;
     const inversionRealUber = disponible * Math.pow(1 + tasaRealInversion, anos);
-    const gananciaInversionUber = inversionUber - disponible;
-    const patrimonioUber = inversionUber;
+    const gananciaInversionUber = inversionTotalUber - disponible;
+    const patrimonioUber = inversionTotalUber - totalGastadoUber;
     
     // === ALTERNATIVA: TRANSPORTE PÚBLICO ===
     const transporteMensual = parseFloat(formData.transportePublico) || 0;
     const totalGastadoTransporte = transporteMensual * 12 * anos;
-    const inversionTransporte = disponible * Math.pow(1 + tasaInv, anos);
+    
+    // Calcular diferencial de gastos
+    const diferencialTransporte = Math.max(0, gastosMensualesAuto - transporteMensual);
+    
+    let inversionTransporte = disponible * Math.pow(1 + tasaInv, anos);
+    let inversionDiferencialTransporte = 0;
+    
+    // Si se invierte el diferencial, calcular inversión de aportes mensuales
+    if (invertirDiferencial && diferencialTransporte > 0) {
+      const mesesTotales = anos * 12;
+      const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
+      inversionDiferencialTransporte = diferencialTransporte * (Math.pow(1 + tasaMensual, mesesTotales) - 1) / tasaMensual;
+    }
+    
+    const inversionTotalTransporte = inversionTransporte + inversionDiferencialTransporte;
     const inversionRealTransporte = disponible * Math.pow(1 + tasaRealInversion, anos);
-    const gananciaInversionTransporte = inversionTransporte - disponible;
-    const patrimonioTransporte = inversionTransporte;
+    const gananciaInversionTransporte = inversionTotalTransporte - disponible;
+    const patrimonioTransporte = inversionTotalTransporte - totalGastadoTransporte;
     
     // === MEJOR OPCIÓN ===
     const opciones = [
@@ -214,19 +253,25 @@ export default function CalculadoraAutoPage() {
         gastoMensual: uberMensual,
         gastoTotal: totalGastadoUber,
         inversionInicial: disponible,
-        inversionFinal: inversionUber,
+        inversionFinal: inversionTotalUber,
         inversionRealFinal: inversionRealUber,
         gananciaInversion: gananciaInversionUber,
-        patrimonioNeto: patrimonioUber
+        patrimonioNeto: patrimonioUber,
+        diferencialMensual: diferencialUber,
+        inversionDiferencial: inversionDiferencialUber,
+        invertirDiferencial: invertirDiferencial
       },
       transporte: {
         gastoMensual: transporteMensual,
         gastoTotal: totalGastadoTransporte,
         inversionInicial: disponible,
-        inversionFinal: inversionTransporte,
+        inversionFinal: inversionTotalTransporte,
         inversionRealFinal: inversionRealTransporte,
         gananciaInversion: gananciaInversionTransporte,
-        patrimonioNeto: patrimonioTransporte
+        patrimonioNeto: patrimonioTransporte,
+        diferencialMensual: diferencialTransporte,
+        inversionDiferencial: inversionDiferencialTransporte,
+        invertirDiferencial: invertirDiferencial
       },
       inflacion: {
         tasa: tasaInfla * 100,
@@ -493,7 +538,25 @@ export default function CalculadoraAutoPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="uberMensual">Uber/Taxi Mensual ($)</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="uberMensual">Uber/Taxi Mensual ($)</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="font-semibold mb-1">¿Cómo calcularlo?</p>
+                          <ul className="text-xs space-y-1">
+                            <li>• Anota cada viaje en Uber durante 1 mes</li>
+                            <li>• Suma todos los gastos del mes</li>
+                            <li>• O estima: viajes por semana × costo promedio × 4</li>
+                            <li>• Ejemplo: 10 viajes/semana × $5 × 4 = $200/mes</li>
+                          </ul>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <NumberInput
                     id="uberMensual"
                     name="uberMensual"
@@ -512,6 +575,32 @@ export default function CalculadoraAutoPage() {
                     value={formData.transportePublico}
                     onChange={handleChange}
                   />
+                </div>
+
+                {/* Opción de invertir el diferencial */}
+                <div className="flex items-start space-x-3 rounded-lg border p-4 bg-emerald-500/5">
+                  <Checkbox
+                    id="invertirDiferencial"
+                    checked={formData.invertirDiferencial === "true"}
+                    onCheckedChange={(checked) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        invertirDiferencial: checked ? "true" : "false"
+                      }));
+                    }}
+                  />
+                  <div className="space-y-1 leading-none">
+                    <Label
+                      htmlFor="invertirDiferencial"
+                      className="text-sm font-medium cursor-pointer"
+                    >
+                      Invertir el ahorro mensual 💰
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Si gastas menos en Uber/Transporte que en mantener un auto, invierte esa diferencia mensualmente. 
+                      Esto hace la comparación más realista.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

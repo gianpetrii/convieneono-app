@@ -89,10 +89,10 @@ export function ResultsDisplay({ resultados, anos, onlyRecommendation }: Results
               {opciones.map((opcion) => (
                 <div 
                   key={opcion.key}
-                  className={`flex justify-between items-center p-2.5 rounded-lg ${getColorClass(opcion.patrimonio)}`}
+                  className={`flex justify-between items-center p-3 rounded-lg ${getColorClass(opcion.patrimonio)}`}
                 >
-                  <span className="text-xs font-medium">{opcion.nombre}</span>
-                  <span className="font-bold text-sm">{formatMoney(opcion.patrimonio)}</span>
+                  <span className="text-sm font-medium">{opcion.nombre}</span>
+                  <span className="font-bold text-base">{formatMoney(opcion.patrimonio)}</span>
                 </div>
               ))}
             </div>
