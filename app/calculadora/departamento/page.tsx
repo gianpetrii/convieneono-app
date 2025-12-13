@@ -571,12 +571,12 @@ export default function CalculadoraInmueblePage() {
                   }}
                 />
                 <div className="space-y-1 leading-none">
-                  <Label
+                  <label
                     htmlFor="invertirDiferencial"
-                    className="text-sm font-medium cursor-pointer"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     Invertir el ahorro mensual 💰
-                  </Label>
+                  </label>
                   <p className="text-xs text-muted-foreground">
                     Si gastas menos en alquiler que en mantener el inmueble, invierte esa diferencia mensualmente. 
                     Esto hace la comparación más realista.
@@ -588,12 +588,11 @@ export default function CalculadoraInmueblePage() {
 
           {/* Opciones Avanzadas */}
           <Card>
-            <CardHeader>
-              <button
-                type="button"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-                className="w-full flex items-center justify-between hover:opacity-70 transition-opacity"
-              >
+            <CardHeader
+              className="cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              <div className="w-full flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-primary" />
                   Opciones Avanzadas
@@ -603,7 +602,7 @@ export default function CalculadoraInmueblePage() {
                 ) : (
                   <ChevronDown className="h-5 w-5" />
                 )}
-              </button>
+              </div>
               {!showAdvanced && (
                 <CardDescription>
                   Tasas de inversión, apreciación e inflación

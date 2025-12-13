@@ -590,12 +590,12 @@ export default function CalculadoraAutoPage() {
                     }}
                   />
                   <div className="space-y-1 leading-none">
-                    <Label
+                    <label
                       htmlFor="invertirDiferencial"
-                      className="text-sm font-medium cursor-pointer"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       Invertir el ahorro mensual 💰
-                    </Label>
+                    </label>
                     <p className="text-xs text-muted-foreground">
                       Si gastas menos en Uber/Transporte que en mantener un auto, invierte esa diferencia mensualmente. 
                       Esto hace la comparación más realista.
@@ -607,18 +607,17 @@ export default function CalculadoraAutoPage() {
 
             {/* Opciones Avanzadas */}
             <Card>
-              <CardHeader>
-                <button
-                  type="button"
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="flex w-full items-center justify-between"
-                >
+              <CardHeader
+                className="cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+              >
+                <div className="flex w-full items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <AlertCircle className="h-5 w-5" />
                     Opciones Avanzadas
                   </CardTitle>
                   {showAdvanced ? <ChevronUp /> : <ChevronDown />}
-                </button>
+                </div>
               </CardHeader>
               {showAdvanced && (
                 <CardContent className="space-y-4">

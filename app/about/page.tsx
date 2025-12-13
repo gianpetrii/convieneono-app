@@ -33,7 +33,7 @@ export default function AboutPage() {
           <CardContent className="space-y-4">
             <p>
               ConvieneONo nació de una experiencia personal. Hace unos años, estaba por 
-              comprar mi primer auto y todos me decían "es una buena inversión". Pero cuando 
+              comprar mi primer auto y todos me decían &quot;es una buena inversión&quot;. Pero cuando 
               sumé TODOS los costos reales (seguro, mantenimiento, depreciación, combustible), 
               me di cuenta de que en 5 años habría perdido más de $15,000.
             </p>
