@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export default function CalculadoraAutoPage() {
+function CalculadoraAutoContent() {
   const searchParams = useSearchParams();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -723,6 +723,23 @@ export default function CalculadoraAutoPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CalculadoraAutoPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Cargando calculadora...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <CalculadoraAutoContent />
+    </Suspense>
   );
 }
 
