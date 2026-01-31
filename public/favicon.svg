@@ -1,0 +1,27 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="#10b981"/>
+  
+  <!-- Calculator body -->
+  <rect x="9" y="8" width="14" height="16" rx="2" fill="white"/>
+  
+  <!-- Calculator display -->
+  <rect x="11" y="10" width="10" height="3" rx="1" fill="#e5e7eb"/>
+  
+  <!-- Calculator buttons (grid) -->
+  <circle cx="12.5" cy="16" r="1" fill="#10b981"/>
+  <circle cx="16" cy="16" r="1" fill="#10b981"/>
+  <circle cx="19.5" cy="16" r="1" fill="#10b981"/>
+  
+  <circle cx="12.5" cy="19" r="1" fill="#10b981"/>
+  <circle cx="16" cy="19" r="1" fill="#10b981"/>
+  <circle cx="19.5" cy="19" r="1" fill="#10b981"/>
+  
+  <circle cx="12.5" cy="22" r="1" fill="#10b981"/>
+  <circle cx="16" cy="22" r="1" fill="#10b981"/>
+  <circle cx="19.5" cy="22" r="1" fill="#10b981"/>
+  
+  <!-- Checkmark overlay -->
+  <circle cx="23" cy="9" r="5" fill="#3b82f6"/>
+  <path d="M21 9 L22.5 10.5 L25 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

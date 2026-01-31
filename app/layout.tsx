@@ -10,6 +10,13 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "ConvieneONo - Calculadora de Decisiones Financieras",
   description: "Descubre si conviene comprar un auto o departamento vs invertir tu dinero. Visualiza el costo real a largo plazo con gastos recurrentes y costo de oportunidad.",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    apple: '/apple-touch-icon.svg',
+  },
 };
 
 export default function RootLayout({

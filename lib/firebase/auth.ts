@@ -10,7 +10,13 @@ import {
 } from "firebase/auth";
 import { auth } from "./config";
 
+const AUTH_DISABLED_ERROR = "Authentication is not configured";
+
 export async function signUp(email: string, password: string, name: string) {
+  if (!auth) {
+    return { user: null, error: AUTH_DISABLED_ERROR };
+  }
+  
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -32,6 +38,10 @@ export async function signUp(email: string, password: string, name: string) {
 }
 
 export async function signIn(email: string, password: string) {
+  if (!auth) {
+    return { user: null, error: AUTH_DISABLED_ERROR };
+  }
+  
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -45,6 +55,10 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signInWithGoogle() {
+  if (!auth) {
+    return { user: null, error: AUTH_DISABLED_ERROR };
+  }
+  
   try {
     const provider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, provider);
@@ -55,6 +69,10 @@ export async function signInWithGoogle() {
 }
 
 export async function signOut() {
+  if (!auth) {
+    return { error: AUTH_DISABLED_ERROR };
+  }
+  
   try {
     await firebaseSignOut(auth);
     return { error: null };
@@ -64,6 +82,10 @@ export async function signOut() {
 }
 
 export async function resetPassword(email: string) {
+  if (!auth) {
+    return { error: AUTH_DISABLED_ERROR };
+  }
+  
   try {
     await sendPasswordResetEmail(auth, email);
     return { error: null };
@@ -73,6 +95,6 @@ export async function resetPassword(email: string) {
 }
 
 export function getCurrentUser(): User | null {
-  return auth.currentUser;
+  return auth?.currentUser || null;
 }
 

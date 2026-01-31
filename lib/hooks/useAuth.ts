@@ -11,6 +11,12 @@ export function useAuth() {
   const router = useRouter();
 
   useEffect(() => {
+    // If Firebase is not configured, set loading to false immediately
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -20,6 +26,11 @@ export function useAuth() {
   }, []);
 
   const logout = async () => {
+    if (!auth) {
+      console.warn("Authentication is not configured");
+      return;
+    }
+    
     try {
       const { signOut } = await import("@/lib/firebase/auth");
       await signOut();

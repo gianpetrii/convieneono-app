@@ -14,11 +14,17 @@ import {
 } from "firebase/firestore";
 import { db } from "./config";
 
+const DB_DISABLED_ERROR = "Database is not configured";
+
 export async function createDocument(
   collectionName: string,
   docId: string,
   data: any
 ) {
+  if (!db) {
+    return { error: DB_DISABLED_ERROR };
+  }
+  
   try {
     await setDoc(doc(db, collectionName, docId), {
       ...data,
@@ -32,6 +38,10 @@ export async function createDocument(
 }
 
 export async function getDocument(collectionName: string, docId: string) {
+  if (!db) {
+    return { data: null, error: DB_DISABLED_ERROR };
+  }
+  
   try {
     const docRef = doc(db, collectionName, docId);
     const docSnap = await getDoc(docRef);
@@ -51,6 +61,10 @@ export async function updateDocument(
   docId: string,
   data: any
 ) {
+  if (!db) {
+    return { error: DB_DISABLED_ERROR };
+  }
+  
   try {
     const docRef = doc(db, collectionName, docId);
     await updateDoc(docRef, {
@@ -64,6 +78,10 @@ export async function updateDocument(
 }
 
 export async function deleteDocument(collectionName: string, docId: string) {
+  if (!db) {
+    return { error: DB_DISABLED_ERROR };
+  }
+  
   try {
     await deleteDoc(doc(db, collectionName, docId));
     return { error: null };
@@ -76,6 +94,10 @@ export async function getDocuments(
   collectionName: string,
   constraints: QueryConstraint[] = []
 ) {
+  if (!db) {
+    return { data: null, error: DB_DISABLED_ERROR };
+  }
+  
   try {
     const q = query(collection(db, collectionName), ...constraints);
     const querySnapshot = await getDocs(q);

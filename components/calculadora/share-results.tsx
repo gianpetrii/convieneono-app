@@ -10,9 +10,10 @@ interface ShareResultsProps {
   formData: any;
   resultados: any;
   tipo: "auto" | "departamento";
+  alternativas?: any[];
 }
 
-export function ShareResults({ formData, resultados, tipo }: ShareResultsProps) {
+export function ShareResults({ formData, resultados, tipo, alternativas = [] }: ShareResultsProps) {
   const [copied, setCopied] = useState(false);
 
   // Generar URL con parámetros
@@ -25,6 +26,11 @@ export function ShareResults({ formData, resultados, tipo }: ShareResultsProps) 
       if (value) params.append(key, String(value));
     });
     
+    // Agregar alternativas como JSON
+    if (alternativas && alternativas.length > 0) {
+      params.append('alternativas', JSON.stringify(alternativas));
+    }
+    
     return `${baseUrl}/calculadora/${tipo}?${params.toString()}`;
   };
 
@@ -34,19 +40,23 @@ export function ShareResults({ formData, resultados, tipo }: ShareResultsProps) 
     
     if (tipo === "auto") {
       const precio = parseFloat(formData.precioAuto || "0");
-      const mejorOpcion = resultados.auto.patrimonioNeto > resultados.uber.patrimonioNeto 
-        ? "comprar el auto" 
-        : "usar Uber e invertir";
+      const mejorOpcion = resultados.mejorOpcion?.nombre || "comprar el auto";
       
-      return `🚗 Calculé si me conviene comprar un auto de $${precio.toLocaleString()}
+      let texto = `🚗 Calculé si me conviene comprar un auto de $${precio.toLocaleString()}
 
 📊 Resultado a ${anos} años:
-• Comprar auto: $${resultados.auto.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}
-• Usar Uber + Invertir: $${resultados.uber.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}
+• Comprar auto: $${resultados.auto.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
 
-💡 Me conviene más: ${mejorOpcion}
+      // Agregar alternativas
+      if (resultados.alternativas && resultados.alternativas.length > 0) {
+        resultados.alternativas.forEach((alt: any) => {
+          texto += `\n• ${alt.nombre}: $${alt.patrimonioNeto.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+        });
+      }
 
-Calcula tu caso en ConvieneONo 👇`;
+      texto += `\n\n💡 Me conviene más: ${mejorOpcion}\n\nCalcula tu caso en ConvieneONo 👇`;
+      
+      return texto;
     }
     
     if (tipo === "departamento") {

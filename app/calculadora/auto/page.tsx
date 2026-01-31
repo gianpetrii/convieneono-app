@@ -34,6 +34,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+interface AlternativaTransporte {
+  id: string;
+  nombre: string;
+  transportePublico: string;
+  uber: string;
+}
+
 function CalculadoraAutoContent() {
   const searchParams = useSearchParams();
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -60,13 +67,9 @@ function CalculadoraAutoContent() {
     patente: "",
     reparacionesAnual: "",
     
-    // Alternativas
-    uberMensual: "",
-    transportePublico: "",
-    invertirDiferencial: "true", // Invertir el ahorro mensual de no tener auto
-    
     // Inversión
     tasaInversion: "8", // % anual
+    invertirDiferencial: "true", // Invertir el ahorro mensual de no tener auto
     
     // Depreciación
     tasaDepreciacionAnual: "15", // % anual promedio
@@ -75,15 +78,47 @@ function CalculadoraAutoContent() {
     tasaInflacion: "3", // % anual
   });
 
+  // Estado separado para alternativas de transporte
+  const [alternativas, setAlternativas] = useState<AlternativaTransporte[]>([
+    {
+      id: "1",
+      nombre: "Solo Uber",
+      transportePublico: "0",
+      uber: ""
+    },
+    {
+      id: "2",
+      nombre: "Solo Transporte Público",
+      transportePublico: "",
+      uber: "0"
+    }
+  ]);
+
   // Cargar datos desde URL params si existen
   useEffect(() => {
     const params: any = {};
+    let alternativasFromUrl: AlternativaTransporte[] = [];
+    
     searchParams.forEach((value, key) => {
-      params[key] = value;
+      if (key === 'alternativas') {
+        try {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed)) {
+            alternativasFromUrl = parsed as AlternativaTransporte[];
+          }
+        } catch (e) {
+          console.error('Error parsing alternativas from URL:', e);
+        }
+      } else {
+        params[key] = value;
+      }
     });
     
     if (Object.keys(params).length > 0) {
       setFormData(prev => ({ ...prev, ...params }));
+      if (alternativasFromUrl.length > 0) {
+        setAlternativas(alternativasFromUrl);
+      }
       setShowResults(true);
     }
   }, [searchParams]);
@@ -93,6 +128,30 @@ function CalculadoraAutoContent() {
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  // Funciones para manejar alternativas
+  const handleAlternativaChange = (id: string, field: keyof AlternativaTransporte, value: string) => {
+    setAlternativas(prev => prev.map(alt => 
+      alt.id === id ? { ...alt, [field]: value } : alt
+    ));
+  };
+
+  const agregarAlternativa = () => {
+    if (alternativas.length >= 5) return;
+    
+    const newId = (Math.max(...alternativas.map(a => parseInt(a.id)), 0) + 1).toString();
+    setAlternativas(prev => [...prev, {
+      id: newId,
+      nombre: `Alternativa ${newId}`,
+      transportePublico: "",
+      uber: ""
+    }]);
+  };
+
+  const eliminarAlternativa = (id: string) => {
+    if (alternativas.length <= 1) return; // Mantener al menos una
+    setAlternativas(prev => prev.filter(alt => alt.id !== id));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -158,57 +217,64 @@ function CalculadoraAutoContent() {
     const patrimonioAuto = valorAuto + inversionRestante;
     const costoRealAuto = precio + totalGastadoAuto - valorAuto; // Lo que realmente te costó el auto
     
-    // === ALTERNATIVA: UBER ===
-    const uberMensual = parseFloat(formData.uberMensual) || 0;
-    const totalGastadoUber = uberMensual * 12 * anos;
+    // === ALTERNATIVAS DE TRANSPORTE ===
     const invertirDiferencial = formData.invertirDiferencial === "true";
     
-    // Calcular diferencial de gastos (lo que ahorras al no tener auto)
-    const diferencialUber = Math.max(0, gastosMensualesAuto - uberMensual);
-    
-    let inversionUber = disponible * Math.pow(1 + tasaInv, anos);
-    let inversionDiferencialUber = 0;
-    
-    // Si se invierte el diferencial, calcular inversión de aportes mensuales
-    if (invertirDiferencial && diferencialUber > 0) {
-      // Fórmula de valor futuro de anualidad: FV = PMT × [((1 + r)^n - 1) / r]
-      const mesesTotales = anos * 12;
-      const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
-      inversionDiferencialUber = diferencialUber * (Math.pow(1 + tasaMensual, mesesTotales) - 1) / tasaMensual;
-    }
-    
-    const inversionTotalUber = inversionUber + inversionDiferencialUber;
-    const inversionRealUber = disponible * Math.pow(1 + tasaRealInversion, anos);
-    const gananciaInversionUber = inversionTotalUber - disponible;
-    const patrimonioUber = inversionTotalUber - totalGastadoUber;
-    
-    // === ALTERNATIVA: TRANSPORTE PÚBLICO ===
-    const transporteMensual = parseFloat(formData.transportePublico) || 0;
-    const totalGastadoTransporte = transporteMensual * 12 * anos;
-    
-    // Calcular diferencial de gastos
-    const diferencialTransporte = Math.max(0, gastosMensualesAuto - transporteMensual);
-    
-    let inversionTransporte = disponible * Math.pow(1 + tasaInv, anos);
-    let inversionDiferencialTransporte = 0;
-    
-    // Si se invierte el diferencial, calcular inversión de aportes mensuales
-    if (invertirDiferencial && diferencialTransporte > 0) {
-      const mesesTotales = anos * 12;
-      const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
-      inversionDiferencialTransporte = diferencialTransporte * (Math.pow(1 + tasaMensual, mesesTotales) - 1) / tasaMensual;
-    }
-    
-    const inversionTotalTransporte = inversionTransporte + inversionDiferencialTransporte;
-    const inversionRealTransporte = disponible * Math.pow(1 + tasaRealInversion, anos);
-    const gananciaInversionTransporte = inversionTotalTransporte - disponible;
-    const patrimonioTransporte = inversionTotalTransporte - totalGastadoTransporte;
+    // Filtrar solo alternativas con valores > 0
+    const alternativasValidas = alternativas.filter(alt => {
+      const tp = parseFloat(alt.transportePublico) || 0;
+      const ub = parseFloat(alt.uber) || 0;
+      return tp > 0 || ub > 0;
+    });
+
+    // Calcular resultados para cada alternativa
+    const resultadosAlternativas = alternativasValidas.map(alt => {
+      const transporteMensual = parseFloat(alt.transportePublico) || 0;
+      const uberMensual = parseFloat(alt.uber) || 0;
+      const gastoMensualTotal = transporteMensual + uberMensual;
+      const totalGastado = gastoMensualTotal * 12 * anos;
+      
+      // Calcular diferencial de gastos (lo que ahorras al no tener auto)
+      const diferencialMensual = Math.max(0, gastosMensualesAuto - gastoMensualTotal);
+      
+      let inversionBase = disponible * Math.pow(1 + tasaInv, anos);
+      let inversionDiferencial = 0;
+      
+      // Si se invierte el diferencial, calcular inversión de aportes mensuales
+      if (invertirDiferencial && diferencialMensual > 0) {
+        // Fórmula de valor futuro de anualidad: FV = PMT × [((1 + r)^n - 1) / r]
+        const mesesTotales = anos * 12;
+        const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
+        inversionDiferencial = diferencialMensual * (Math.pow(1 + tasaMensual, mesesTotales) - 1) / tasaMensual;
+      }
+      
+      const inversionTotal = inversionBase + inversionDiferencial;
+      const inversionReal = disponible * Math.pow(1 + tasaRealInversion, anos);
+      const gananciaInversion = inversionTotal - disponible;
+      const patrimonioNeto = inversionTotal - totalGastado;
+      
+      return {
+        id: alt.id,
+        nombre: alt.nombre,
+        gastoMensualTransporte: transporteMensual,
+        gastoMensualUber: uberMensual,
+        gastoMensualTotal,
+        gastoTotal: totalGastado,
+        inversionInicial: disponible,
+        inversionFinal: inversionTotal,
+        inversionRealFinal: inversionReal,
+        gananciaInversion,
+        patrimonioNeto,
+        diferencialMensual,
+        inversionDiferencial,
+        invertirDiferencial
+      };
+    });
     
     // === MEJOR OPCIÓN ===
     const opciones = [
       { nombre: 'Comprar Auto', patrimonio: patrimonioAuto },
-      { nombre: 'Uber + Invertir', patrimonio: patrimonioUber },
-      { nombre: 'Transporte + Invertir', patrimonio: patrimonioTransporte }
+      ...resultadosAlternativas.map(alt => ({ nombre: alt.nombre, patrimonio: alt.patrimonioNeto }))
     ];
     const mejorOpcion = opciones.reduce((prev, current) => 
       current.patrimonio > prev.patrimonio ? current : prev
@@ -249,40 +315,12 @@ function CalculadoraAutoContent() {
         patrimonioNeto: patrimonioAuto,
         costoReal: costoRealAuto
       },
-      uber: {
-        gastoMensual: uberMensual,
-        gastoTotal: totalGastadoUber,
-        inversionInicial: disponible,
-        inversionFinal: inversionTotalUber,
-        inversionRealFinal: inversionRealUber,
-        gananciaInversion: gananciaInversionUber,
-        patrimonioNeto: patrimonioUber,
-        diferencialMensual: diferencialUber,
-        inversionDiferencial: inversionDiferencialUber,
-        invertirDiferencial: invertirDiferencial
-      },
-      transporte: {
-        gastoMensual: transporteMensual,
-        gastoTotal: totalGastadoTransporte,
-        inversionInicial: disponible,
-        inversionFinal: inversionTotalTransporte,
-        inversionRealFinal: inversionRealTransporte,
-        gananciaInversion: gananciaInversionTransporte,
-        patrimonioNeto: patrimonioTransporte,
-        diferencialMensual: diferencialTransporte,
-        inversionDiferencial: inversionDiferencialTransporte,
-        invertirDiferencial: invertirDiferencial
-      },
+      alternativas: resultadosAlternativas,
       inflacion: {
         tasa: tasaInfla * 100,
         tasaRealInversion: tasaRealInversion * 100
       },
-      mejorOpcion,
-      diferencias: {
-        autoVsUber: patrimonioAuto - patrimonioUber,
-        autoVsTransporte: patrimonioAuto - patrimonioTransporte,
-        uberVsTransporte: patrimonioUber - patrimonioTransporte
-      }
+      mejorOpcion
     };
   };
 
@@ -533,48 +571,95 @@ function CalculadoraAutoContent() {
               <CardHeader>
                 <CardTitle>Alternativas de Transporte</CardTitle>
                 <CardDescription>
-                  ¿Cuánto gastarías si no compras el auto?
+                  Compara diferentes opciones de movilidad sin comprar el auto
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="uberMensual">Uber/Taxi Mensual ($)</Label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-xs">
-                          <p className="font-semibold mb-1">¿Cómo calcularlo?</p>
-                          <ul className="text-xs space-y-1">
-                            <li>• Anota cada viaje en Uber durante 1 mes</li>
-                            <li>• Suma todos los gastos del mes</li>
-                            <li>• O estima: viajes por semana × costo promedio × 4</li>
-                            <li>• Ejemplo: 10 viajes/semana × $5 × 4 = $200/mes</li>
-                          </ul>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <NumberInput
-                    id="uberMensual"
-                    name="uberMensual"
-                    placeholder="150"
-                    value={formData.uberMensual}
-                    onChange={handleChange}
-                  />
-                </div>
+              <CardContent className="space-y-6">
+                {/* Lista de alternativas */}
+                {alternativas.map((alt, index) => (
+                  <div key={alt.id} className="space-y-3 p-4 rounded-lg border bg-muted/30">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-base font-semibold">
+                        Alternativa {index + 1}
+                      </Label>
+                      {alternativas.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => eliminarAlternativa(alt.id)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                        >
+                          ✕
+                        </Button>
+                      )}
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="transportePublico">Transporte Público Mensual ($)</Label>
-                  <NumberInput
-                    id="transportePublico"
-                    name="transportePublico"
-                    placeholder="50"
-                    value={formData.transportePublico}
-                    onChange={handleChange}
-                  />
+                    <div className="space-y-2">
+                      <Label htmlFor={`nombre-${alt.id}`}>Nombre</Label>
+                      <Input
+                        id={`nombre-${alt.id}`}
+                        value={alt.nombre}
+                        onChange={(e) => handleAlternativaChange(alt.id, 'nombre', e.target.value)}
+                        placeholder="Ej: Solo Uber, Combinado, etc."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor={`transporte-${alt.id}`}>Transporte Público ($)</Label>
+                        <NumberInput
+                          id={`transporte-${alt.id}`}
+                          value={alt.transportePublico}
+                          onChange={(e) => handleAlternativaChange(alt.id, 'transportePublico', e.target.value)}
+                          placeholder="0"
+                        />
+                        <p className="text-xs text-muted-foreground">$/mes</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`uber-${alt.id}`}>Uber/Taxi ($)</Label>
+                        <NumberInput
+                          id={`uber-${alt.id}`}
+                          value={alt.uber}
+                          onChange={(e) => handleAlternativaChange(alt.id, 'uber', e.target.value)}
+                          placeholder="0"
+                        />
+                        <p className="text-xs text-muted-foreground">$/mes</p>
+                      </div>
+                    </div>
+
+                    {/* Mostrar total */}
+                    {(parseFloat(alt.transportePublico) > 0 || parseFloat(alt.uber) > 0) && (
+                      <div className="pt-2 border-t">
+                        <p className="text-sm font-medium">
+                          Total mensual: ${((parseFloat(alt.transportePublico) || 0) + (parseFloat(alt.uber) || 0)).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Botón para agregar alternativa */}
+                {alternativas.length < 5 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={agregarAlternativa}
+                    className="w-full"
+                  >
+                    + Agregar alternativa
+                  </Button>
+                )}
+
+                {/* Ayuda con ejemplos */}
+                <div className="rounded-lg border p-4 bg-blue-500/5">
+                  <p className="text-sm font-medium mb-2">💡 Ejemplos:</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• <strong>Solo Uber:</strong> Transporte: $0, Uber: $200</li>
+                    <li>• <strong>Solo Transporte:</strong> Transporte: $50, Uber: $0</li>
+                    <li>• <strong>Combinado:</strong> Transporte: $50, Uber: $80</li>
+                  </ul>
                 </div>
 
                 {/* Opción de invertir el diferencial */}
@@ -592,12 +677,12 @@ function CalculadoraAutoContent() {
                   <div className="space-y-1 leading-none">
                     <label
                       htmlFor="invertirDiferencial"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                     >
                       Invertir el ahorro mensual 💰
                     </label>
                     <p className="text-xs text-muted-foreground">
-                      Si gastas menos en Uber/Transporte que en mantener un auto, invierte esa diferencia mensualmente. 
+                      Si gastas menos en transporte alternativo que en mantener un auto, invierte esa diferencia mensualmente. 
                       Esto hace la comparación más realista.
                     </p>
                   </div>
@@ -718,6 +803,7 @@ function CalculadoraAutoContent() {
               formData={formData}
               resultados={resultados}
               tipo="auto"
+              alternativas={alternativas}
             />
           </div>
         </div>

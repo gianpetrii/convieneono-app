@@ -21,10 +21,11 @@ interface ChartsProps {
 export function Charts({ resultados, anos, formData }: ChartsProps) {
   const anosNum = parseInt(anos);
   
-  // Obtener valores de gastos mensuales
-  const uberMensual = parseFloat(formData.uberMensual) || 0;
-  const transporteMensual = parseFloat(formData.transportePublico) || 0;
   const invertirDiferencial = formData.invertirDiferencial === "true";
+  const alternativas = resultados.alternativas || [];
+  
+  // Colores para las alternativas
+  const colores = ['#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
   
   // Generar datos para el gráfico de línea (patrimonio a lo largo del tiempo)
   const generateTimelineData = () => {
@@ -45,52 +46,31 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
       const inversionAuto = dineroRestante * Math.pow(1 + tasaInv, year);
       const patrimonioAuto = valorAuto + inversionAuto;
 
-      // Uber + Invertir - CORREGIDO: restar gastos acumulados + invertir diferencial
-      let inversionUber = disponible * Math.pow(1 + tasaInv, year);
-      const gastosUberAcumulados = uberMensual * 12 * year;
-      
-      // Si se invierte el diferencial, agregar inversión de aportes mensuales
-      if (invertirDiferencial && year > 0) {
-        const diferencialUber = Math.max(0, gastoAnual / 12 - uberMensual);
-        if (diferencialUber > 0) {
-          const meses = year * 12;
-          const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
-          const inversionDiferencial = diferencialUber * (Math.pow(1 + tasaMensual, meses) - 1) / tasaMensual;
-          inversionUber += inversionDiferencial;
-        }
-      }
-      
-      const patrimonioUber = inversionUber - gastosUberAcumulados;
-
-      // Transporte + Invertir - CORREGIDO: restar gastos acumulados + invertir diferencial
-      let inversionTransporte = disponible * Math.pow(1 + tasaInv, year);
-      const gastosTransporteAcumulados = transporteMensual * 12 * year;
-      
-      // Si se invierte el diferencial, agregar inversión de aportes mensuales
-      if (invertirDiferencial && year > 0) {
-        const diferencialTransporte = Math.max(0, gastoAnual / 12 - transporteMensual);
-        if (diferencialTransporte > 0) {
-          const meses = year * 12;
-          const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
-          const inversionDiferencial = diferencialTransporte * (Math.pow(1 + tasaMensual, meses) - 1) / tasaMensual;
-          inversionTransporte += inversionDiferencial;
-        }
-      }
-      
-      const patrimonioTransporte = inversionTransporte - gastosTransporteAcumulados;
-
       const dataPoint: any = {
         año: year,
         'Comprar Auto': Math.round(patrimonioAuto),
       };
       
-      if (uberMensual > 0) {
-        dataPoint['Uber + Invertir'] = Math.round(patrimonioUber);
-      }
-      
-      if (transporteMensual > 0) {
-        dataPoint['Transporte + Invertir'] = Math.round(patrimonioTransporte);
-      }
+      // Calcular para cada alternativa
+      alternativas.forEach((alt: any) => {
+        const gastoMensual = alt.gastoMensualTotal;
+        let inversion = disponible * Math.pow(1 + tasaInv, year);
+        const gastosAcumulados = gastoMensual * 12 * year;
+        
+        // Si se invierte el diferencial, agregar inversión de aportes mensuales
+        if (invertirDiferencial && year > 0) {
+          const diferencialMensual = Math.max(0, gastoAnual / 12 - gastoMensual);
+          if (diferencialMensual > 0) {
+            const meses = year * 12;
+            const tasaMensual = Math.pow(1 + tasaInv, 1/12) - 1;
+            const inversionDiferencial = diferencialMensual * (Math.pow(1 + tasaMensual, meses) - 1) / tasaMensual;
+            inversion += inversionDiferencial;
+          }
+        }
+        
+        const patrimonio = inversion - gastosAcumulados;
+        dataPoint[alt.nombre] = Math.round(patrimonio);
+      });
 
       data.push(dataPoint);
     }
@@ -150,26 +130,17 @@ export function Charts({ resultados, anos, formData }: ChartsProps) {
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
               />
-              {uberMensual > 0 && (
+              {alternativas.map((alt: any, index: number) => (
                 <Line 
+                  key={alt.id}
                   type="monotone" 
-                  dataKey="Uber + Invertir" 
-                  stroke="#10b981" 
+                  dataKey={alt.nombre} 
+                  stroke={colores[index % colores.length]} 
                   strokeWidth={2}
                   dot={{ r: 4 }}
                   activeDot={{ r: 6 }}
                 />
-              )}
-              {transporteMensual > 0 && (
-                <Line 
-                  type="monotone" 
-                  dataKey="Transporte + Invertir" 
-                  stroke="#8b5cf6" 
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              )}
+              ))}
             </LineChart>
           </ResponsiveContainer>
         </div>
