@@ -10,6 +10,9 @@
   <path d="M8 18h.01"/>
   <path d="M12 18h.01"/>
   <style>
-    svg { color: #10b981; }
+    svg { color: #3b82f6; }
+    @media (prefers-color-scheme: dark) {
+      svg { color: #60a5fa; }
+    }
   </style>
 </svg>
