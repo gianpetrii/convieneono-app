@@ -1,30 +1,15 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background with rounded corners -->
-  <rect width="180" height="180" rx="40" fill="#10b981"/>
-  
-  <!-- Calculator body -->
-  <rect x="45" y="40" width="90" height="100" rx="8" fill="white"/>
-  
-  <!-- Calculator display -->
-  <rect x="55" y="52" width="70" height="18" rx="4" fill="#e5e7eb"/>
-  
-  <!-- Calculator buttons (3x4 grid) -->
-  <!-- Row 1 -->
-  <circle cx="67" cy="90" r="6" fill="#10b981"/>
-  <circle cx="90" cy="90" r="6" fill="#10b981"/>
-  <circle cx="113" cy="90" r="6" fill="#10b981"/>
-  
-  <!-- Row 2 -->
-  <circle cx="67" cy="108" r="6" fill="#10b981"/>
-  <circle cx="90" cy="108" r="6" fill="#10b981"/>
-  <circle cx="113" cy="108" r="6" fill="#10b981"/>
-  
-  <!-- Row 3 -->
-  <circle cx="67" cy="126" r="6" fill="#10b981"/>
-  <circle cx="90" cy="126" r="6" fill="#10b981"/>
-  <circle cx="113" cy="126" r="6" fill="#10b981"/>
-  
-  <!-- Checkmark overlay (larger) -->
-  <circle cx="135" cy="45" r="28" fill="#3b82f6"/>
-  <path d="M120 45 L130 55 L150 35" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <rect width="180" height="180" fill="#10b981" rx="40"/>
+  <g transform="translate(45, 30)" stroke="white" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="90" height="112.5" x="0" y="0" rx="11.25"/>
+    <line x1="22.5" x2="67.5" y1="22.5" y2="22.5"/>
+    <line x1="67.5" x2="67.5" y1="78.75" y2="101.25"/>
+    <path d="M67.5 56.25h.056"/>
+    <path d="M45 56.25h.056"/>
+    <path d="M22.5 56.25h.056"/>
+    <path d="M45 78.75h.056"/>
+    <path d="M22.5 78.75h.056"/>
+    <path d="M22.5 101.25h.056"/>
+    <path d="M45 101.25h.056"/>
+  </g>
 </svg>
