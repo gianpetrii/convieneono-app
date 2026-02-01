@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,10 @@ import { toast } from "sonner";
 import { Mail, MessageSquare, Send, Linkedin, Github, Twitter, Clock } from "lucide-react";
 
 export default function ContactPage() {
+  // Set page title
+  useEffect(() => {
+    document.title = "Contacto - ConvieneONo";
+  }, []);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -77,7 +81,7 @@ export default function ContactPage() {
           </div>
           <h1 className="text-4xl font-bold">Contacto</h1>
           <p className="text-lg text-muted-foreground">
-            ¿Tienes preguntas, sugerencias o encontraste un error? Me encantaría saber de ti.
+            ¿Tienes preguntas, sugerencias o encontraste un error? Escríbeme y te responderé pronto.
           </p>
         </div>
 
@@ -92,10 +96,10 @@ export default function ContactPage() {
             </CardHeader>
             <CardContent>
               <a 
-                href="mailto:contacto@convieneono.com" 
-                className="text-primary hover:underline font-medium"
+                href="mailto:gianluca.petri.98@gmail.com" 
+                className="text-primary hover:underline font-medium break-all"
               >
-                contacto@convieneono.com
+                gianluca.petri.98@gmail.com
               </a>
             </CardContent>
           </Card>
@@ -120,7 +124,7 @@ export default function ContactPage() {
           <CardHeader>
             <CardTitle>Envíame un mensaje</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Completa el formulario y me pondré en contacto contigo pronto
+              Completa el formulario y te responderé lo antes posible
             </p>
           </CardHeader>
           <CardContent>
@@ -186,7 +190,7 @@ export default function ContactPage() {
           <CardContent>
             <div className="flex flex-wrap gap-4">
               <a
-                href="https://linkedin.com/in/tu-perfil"
+                href="https://www.linkedin.com/in/gianluca-petri/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -198,7 +202,7 @@ export default function ContactPage() {
               </a>
 
               <a
-                href="https://github.com/tu-usuario"
+                href="https://github.com/gianpetrii"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -210,7 +214,7 @@ export default function ContactPage() {
               </a>
 
               <a
-                href="https://twitter.com/tu-usuario"
+                href="https://x.com/gianpetrii"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -218,21 +222,36 @@ export default function ContactPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
                   <Twitter className="h-5 w-5 text-primary" />
                 </div>
-                <span>Twitter</span>
+                <span>X (Twitter)</span>
               </a>
             </div>
           </CardContent>
         </Card>
 
         {/* Additional Info */}
-        <div className="bg-gradient-to-br from-emerald-500/10 via-blue-500/10 to-purple-500/10 rounded-lg p-6 text-center">
-          <h3 className="text-lg font-semibold mb-2">¿Qué tipo de mensajes me puedes enviar?</h3>
-          <div className="text-sm text-muted-foreground space-y-1">
-            <p>✓ Reportar bugs o errores en las calculadoras</p>
-            <p>✓ Sugerir nuevas funcionalidades</p>
-            <p>✓ Hacer preguntas sobre cómo usar la herramienta</p>
-            <p>✓ Compartir tu experiencia usando ConvieneONo</p>
-            <p>✓ Proponer colaboraciones o ideas</p>
+        <div className="bg-gradient-to-br from-emerald-500/10 via-blue-500/10 to-purple-500/10 rounded-lg p-6 text-center border border-primary/10">
+          <h3 className="text-lg font-semibold mb-3">¿Qué tipo de mensajes puedes enviarme?</h3>
+          <div className="text-sm text-muted-foreground space-y-2 text-left max-w-md mx-auto">
+            <p className="flex items-start gap-2">
+              <span className="text-emerald-600 mt-0.5">✓</span>
+              <span>Reportar bugs o errores en las calculadoras</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-emerald-600 mt-0.5">✓</span>
+              <span>Sugerir nuevas funcionalidades</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-emerald-600 mt-0.5">✓</span>
+              <span>Hacer preguntas sobre cómo usar la herramienta</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-emerald-600 mt-0.5">✓</span>
+              <span>Compartir tu experiencia usando ConvieneONo</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-emerald-600 mt-0.5">✓</span>
+              <span>Proponer colaboraciones o ideas</span>
+            </p>
           </div>
         </div>
       </div>
