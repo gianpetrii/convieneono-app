@@ -1,9 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calculator, Target, Users, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calculator, Target, Users, Heart, Car, Home as HomeIcon, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Acerca de ConvieneONo",
-  description: "Conoce la historia detrás de ConvieneONo y cómo ayudamos a las personas a tomar mejores decisiones financieras",
+export const metadata: Metadata = {
+  title: "Acerca de ConvieneONo - Historia y Misión",
+  description: "Descubre por qué creé ConvieneONo y cómo esta herramienta te ayuda a tomar mejores decisiones financieras sobre autos y departamentos.",
+  keywords: "acerca de convieneono, historia, misión, decisiones financieras, calculadora financiera",
+  openGraph: {
+    title: "Acerca de ConvieneONo",
+    description: "La historia detrás de la calculadora financiera que te ayuda a tomar mejores decisiones.",
+    type: "website",
+  },
 };
 
 export default function AboutPage() {
@@ -27,24 +36,23 @@ export default function AboutPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Mi Misión
+              Por qué creé ConvieneONo
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              ConvieneONo nació de una experiencia personal. Hace unos años, estaba por 
-              comprar mi primer auto y todos me decían &quot;es una buena inversión&quot;. Pero cuando 
-              sumé TODOS los costos reales (seguro, mantenimiento, depreciación, combustible), 
-              me di cuenta de que en 5 años habría perdido más de $15,000.
+              Hace un tiempo, estaba considerando comprar un auto. Todos me decían que era 
+              una buena decisión, pero decidí hacer los números primero.
             </p>
             <p>
-              Decidí seguir usando transporte público e invertir ese dinero. Hoy, esos ahorros 
-              se convirtieron en la inicial de mi departamento. Esa decisión cambió mi vida 
-              financiera.
+              Cuando analicé los gastos iniciales y el mantenimiento mensual, me di cuenta de 
+              algo importante: <strong>los números no cerraban</strong>. El costo real era mucho 
+              más alto de lo que había imaginado. Empecé a considerar alternativas: ¿una moto? 
+              ¿Uber? Al comparar, descubrí que no comprar era la decisión más inteligente.
             </p>
             <p className="font-semibold">
-              Creé ConvieneONo para que tú también puedas ver el panorama completo antes 
-              de tomar decisiones financieras importantes.
+              Creé ConvieneONo para que tú también puedas hacer este análisis de forma simple 
+              y ver el panorama completo antes de tomar decisiones financieras importantes.
             </p>
           </CardContent>
         </Card>
@@ -97,7 +105,7 @@ export default function AboutPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Mi metodología es simple pero poderosa:
+              La metodología que uso es simple pero poderosa:
             </p>
             <ol className="space-y-3 ml-4">
               <li className="flex items-start gap-3">
@@ -105,7 +113,7 @@ export default function AboutPage() {
                   1
                 </span>
                 <div>
-                  <strong>Recopilamos tus datos reales:</strong> No usamos promedios. 
+                  <strong>Recopilo tus datos reales:</strong> No uso promedios genéricos. 
                   Tú ingresas tu situación específica.
                 </div>
               </li>
@@ -114,7 +122,7 @@ export default function AboutPage() {
                   2
                 </span>
                 <div>
-                  <strong>Calculamos todos los costos:</strong> Incluimos gastos recurrentes, 
+                  <strong>Calculo todos los costos:</strong> Incluyo gastos recurrentes, 
                   depreciación, inflación y rendimientos de inversión.
                 </div>
               </li>
@@ -123,7 +131,7 @@ export default function AboutPage() {
                   3
                 </span>
                 <div>
-                  <strong>Mostramos comparaciones visuales:</strong> Gráficos claros que 
+                  <strong>Muestro comparaciones visuales:</strong> Gráficos claros que 
                   proyectan tu situación a 1, 5, 10 y 20 años.
                 </div>
               </li>
@@ -132,7 +140,7 @@ export default function AboutPage() {
                   4
                 </span>
                 <div>
-                  <strong>Tú decides:</strong> Te damos la información, tú tomas la decisión 
+                  <strong>Tú decides:</strong> Te doy la información, tú tomas la decisión 
                   que mejor se ajuste a tus objetivos.
                 </div>
               </li>
@@ -154,8 +162,8 @@ export default function AboutPage() {
                 los cálculos. Sin trucos, sin letra chica.
               </li>
               <li>
-                <strong className="text-primary">Simplicidad:</strong> Finanzas personales 
-                no tiene que ser complicado. Lo hago fácil de entender.
+                <strong className="text-primary">Simplicidad:</strong> Las finanzas personales 
+                no tienen que ser complicadas. Hago todo fácil de entender.
               </li>
               <li>
                 <strong className="text-primary">Gratuito:</strong> Creo que todos 
@@ -163,25 +171,32 @@ export default function AboutPage() {
               </li>
               <li>
                 <strong className="text-primary">Sin sesgos:</strong> No vendo autos, 
-                departamentos ni productos financieros. Solo te muestro los números.
+                departamentos ni productos financieros. Solo muestro los números reales.
               </li>
             </ul>
           </CardContent>
         </Card>
 
-        <div className="bg-gradient-to-br from-emerald-500/10 via-blue-500/10 to-purple-500/10 rounded-lg p-8 text-center">
+        <div className="bg-gradient-to-br from-emerald-500/10 via-blue-500/10 to-purple-500/10 rounded-lg p-8 text-center border border-primary/10">
           <h3 className="text-2xl font-bold mb-3">¿Listo para tomar una mejor decisión?</h3>
-          <p className="text-muted-foreground mb-4">
-            Únete a miles de personas que ya usaron ConvieneONo para tomar decisiones 
-            financieras más inteligentes.
+          <p className="text-muted-foreground mb-6">
+            Usa las calculadoras y descubre el costo real de tu próxima gran compra.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="/calculadora/auto" className="text-primary hover:underline font-semibold">
-              Calcular Auto →
-            </a>
-            <a href="/calculadora/departamento" className="text-primary hover:underline font-semibold">
-              Calcular Departamento →
-            </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/calculadora/auto">
+              <Button size="lg" className="gap-2 w-full sm:w-auto">
+                <Car className="h-5 w-5" />
+                Calcular Auto
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/calculadora/departamento">
+              <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto">
+                <HomeIcon className="h-5 w-5" />
+                Calcular Departamento
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
