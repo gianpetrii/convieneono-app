@@ -150,45 +150,73 @@ export function ResultsDisplayInmueble({ resultados, anos, onlyRecommendation }:
             </div>
           </div>
 
-          {/* Gastos Mensuales */}
+          {/* Gastos del Propietario */}
           <div>
             <h4 className="font-semibold text-sm mb-2 flex items-center gap-1">
               <Building2 className="h-3.5 w-3.5 text-orange-600" />
-              Gastos Mensuales
+              Gastos del Propietario
             </h4>
             <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span>Expensas:</span>
-                <span>{formatMoney(inmueble.desglose.expensas)}</span>
+                <span>{formatMoney(inmueble.desglosePropietario.expensas)}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span>Impuestos:</span>
-                <span>{formatMoney(inmueble.desglose.impuestosMunicipales)}</span>
+                <span>{formatMoney(inmueble.desglosePropietario.impuestosMunicipales)}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span>Seguro:</span>
-                <span>{formatMoney(inmueble.desglose.seguro)}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span>Luz:</span>
-                <span>{formatMoney(inmueble.desglose.luz)}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span>Agua:</span>
-                <span>{formatMoney(inmueble.desglose.agua)}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span>Gas:</span>
-                <span>{formatMoney(inmueble.desglose.gas)}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span>Internet:</span>
-                <span>{formatMoney(inmueble.desglose.internet)}</span>
+                <span>{formatMoney(inmueble.desglosePropietario.seguro)}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span>Mantenimiento:</span>
-                <span>{formatMoney(inmueble.desglose.mantenimiento)}</span>
+                <span>{formatMoney(inmueble.desglosePropietario.mantenimiento)}</span>
               </div>
+              <div className="flex justify-between text-xs border-t pt-1.5">
+                <span className="font-semibold">Subtotal propietario:</span>
+                <span className="font-semibold text-orange-600">{formatMoney(inmueble.desglosePropietario.total)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Servicios Básicos */}
+          <div>
+            <h4 className="font-semibold text-sm mb-2 flex items-center gap-1">
+              <DollarSign className="h-3.5 w-3.5 text-blue-600" />
+              Servicios Básicos
+            </h4>
+            <div className="bg-blue-500/5 rounded-lg p-3 space-y-1.5 border border-blue-500/20">
+              <div className="flex justify-between text-xs">
+                <span>Luz:</span>
+                <span>{formatMoney(inmueble.desgloseServicios.luz)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span>Agua:</span>
+                <span>{formatMoney(inmueble.desgloseServicios.agua)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span>Gas:</span>
+                <span>{formatMoney(inmueble.desgloseServicios.gas)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span>Internet:</span>
+                <span>{formatMoney(inmueble.desgloseServicios.internet)}</span>
+              </div>
+              <div className="flex justify-between text-xs border-t pt-1.5">
+                <span className="font-semibold">Subtotal servicios:</span>
+                <span className="font-semibold text-blue-600">{formatMoney(inmueble.desgloseServicios.total)}</span>
+              </div>
+              <p className="text-xs text-muted-foreground pt-1">
+                ℹ️ Estos servicios se pagan igual al comprar o alquilar
+              </p>
+            </div>
+          </div>
+
+          {/* Total Mensual */}
+          <div>
+            <h4 className="font-semibold text-sm mb-2">Resumen Gastos Mensuales</h4>
+            <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
               <div className="flex justify-between text-xs border-t pt-1.5">
                 <span className="font-semibold">Total mensual:</span>
                 <span className="font-semibold text-orange-600">{formatMoney(inmueble.gastoMensual)}</span>
@@ -322,12 +350,20 @@ export function ResultsDisplayInmueble({ resultados, anos, onlyRecommendation }:
               <div>
                 <h4 className="font-semibold text-sm mb-2 flex items-center gap-1">
                   <TrendingDown className="h-3.5 w-3.5 text-red-600" />
-                  Gastos de Alquiler
+                  Gastos Mensuales
                 </h4>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1.5">
                   <div className="flex justify-between text-xs">
                     <span>Alquiler mensual:</span>
-                    <span className="font-semibold">{formatMoney(alquiler.gastoMensual)}</span>
+                    <span className="font-semibold">{formatMoney(alquiler.alquilerMensual)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Servicios básicos:</span>
+                    <span className="font-semibold">{formatMoney(alquiler.serviciosBasicos)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs border-t pt-1.5">
+                    <span className="font-semibold">Total mensual:</span>
+                    <span className="font-semibold text-orange-600">{formatMoney(alquiler.gastoMensualTotal)}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span>Total en {anos} años:</span>

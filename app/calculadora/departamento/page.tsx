@@ -45,20 +45,22 @@ function CalculadoraInmuebleContent() {
     dineroDisponible: "",
     anosProyeccion: "10",
     
-    // Gastos mensuales del inmueble
+    // Gastos del propietario (solo al comprar)
     expensas: "",
     impuestosMunicipales: "",
     seguroHogar: "",
+    mantenimientoMensual: "",
+    
+    // Servicios básicos (se pagan igual en ambos casos)
     luz: "",
     agua: "",
     gas: "",
     internet: "",
-    mantenimientoMensual: "",
     
     // Gastos iniciales (una vez)
-    escrituracion: "", // Se calculará como % si está vacío
-    impuestoTransferencia: "", // Se calculará como % si está vacío
-    comisionInmobiliaria: "", // Se calculará como % si está vacío
+    escrituracion: "",
+    impuestoTransferencia: "",
+    comisionInmobiliaria: "",
     
     // Alternativa: Alquilar
     alquilerMensual: "",
@@ -69,10 +71,15 @@ function CalculadoraInmuebleContent() {
     tasaApreciacion: "3", // % anual (el inmueble GANA valor)
     tasaInflacion: "3.5", // % anual - Valor sugerido INDEC
     
-    // Porcentajes para gastos iniciales (editables)
+    // Porcentajes para gastos iniciales
     porcentajeEscrituracion: "3",
     porcentajeImpuesto: "1.5",
     porcentajeComision: "4",
+    
+    // Modo de entrada para gastos iniciales (monto o porcentaje)
+    modoEscrituracion: "porcentaje", // "monto" o "porcentaje"
+    modoImpuesto: "porcentaje",
+    modoComision: "porcentaje",
   });
 
   // Cargar datos desde URL params si existen
@@ -107,14 +114,22 @@ function CalculadoraInmuebleContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Calcular gastos iniciales automáticamente si están vacíos
-  const calcularGastoInicial = (campo: string, porcentaje: string) => {
-    const valor = formData[campo as keyof typeof formData];
-    if (valor && valor !== "") return parseFloat(valor);
-    
+  const formatMoney = (value: number) => {
+    return `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  };
+
+  // Calcular gastos iniciales según el modo seleccionado
+  const calcularGastoInicial = (campo: string, porcentaje: string, modoCampo: string) => {
     const precio = parseFloat(formData.precioInmueble) || 0;
-    const porc = parseFloat(porcentaje) / 100 || 0;
-    return precio * porc;
+    const modo = formData[modoCampo as keyof typeof formData] as string;
+    
+    if (modo === "porcentaje") {
+      const porc = parseFloat(porcentaje) / 100 || 0;
+      return precio * porc;
+    } else {
+      const valor = formData[campo as keyof typeof formData];
+      return parseFloat(valor as string) || 0;
+    }
   };
 
   // Cálculos
@@ -124,23 +139,27 @@ function CalculadoraInmuebleContent() {
     const anos = parseInt(formData.anosProyeccion) || 10;
     
     // === GASTOS INICIALES (UNA VEZ) ===
-    const escrituracion = calcularGastoInicial('escrituracion', formData.porcentajeEscrituracion);
-    const impuestoTransf = calcularGastoInicial('impuestoTransferencia', formData.porcentajeImpuesto);
-    const comision = calcularGastoInicial('comisionInmobiliaria', formData.porcentajeComision);
+    const escrituracion = calcularGastoInicial('escrituracion', formData.porcentajeEscrituracion, 'modoEscrituracion');
+    const impuestoTransf = calcularGastoInicial('impuestoTransferencia', formData.porcentajeImpuesto, 'modoImpuesto');
+    const comision = calcularGastoInicial('comisionInmobiliaria', formData.porcentajeComision, 'modoComision');
     const gastosIniciales = escrituracion + impuestoTransf + comision;
     const inversionTotal = precio + gastosIniciales;
     
-    // === GASTOS MENSUALES DEL INMUEBLE ===
+    // === GASTOS DEL PROPIETARIO (solo al comprar) ===
     const expensas = parseFloat(formData.expensas) || 0;
     const impuestosMunicipales = parseFloat(formData.impuestosMunicipales) || 0;
     const seguro = parseFloat(formData.seguroHogar) || 0;
+    const mantenimiento = parseFloat(formData.mantenimientoMensual) || 0;
+    const gastosPropietario = expensas + impuestosMunicipales + seguro + mantenimiento;
+    
+    // === SERVICIOS BÁSICOS (se pagan igual en ambos casos) ===
     const luz = parseFloat(formData.luz) || 0;
     const agua = parseFloat(formData.agua) || 0;
     const gas = parseFloat(formData.gas) || 0;
     const internet = parseFloat(formData.internet) || 0;
-    const mantenimiento = parseFloat(formData.mantenimientoMensual) || 0;
+    const serviciosBasicos = luz + agua + gas + internet;
     
-    const gastosMensualesInmueble = expensas + impuestosMunicipales + seguro + luz + agua + gas + internet + mantenimiento;
+    const gastosMensualesInmueble = gastosPropietario + serviciosBasicos;
     
     // === GASTOS ANUALES ===
     const gastosAnualesInmueble = gastosMensualesInmueble * 12;
@@ -171,11 +190,14 @@ function CalculadoraInmuebleContent() {
     
     // === ALTERNATIVA: ALQUILAR ===
     const alquilerMensual = parseFloat(formData.alquilerMensual) || 0;
-    const totalGastadoAlquiler = alquilerMensual * 12 * anos;
+    // Al alquilar también pagas servicios básicos
+    const gastosMensualesAlquiler = alquilerMensual + serviciosBasicos;
+    const totalGastadoAlquiler = gastosMensualesAlquiler * 12 * anos;
     const invertirDiferencial = formData.invertirDiferencial === "true";
     
     // Calcular diferencial de gastos (lo que ahorras al alquilar vs comprar)
-    const diferencialAlquiler = Math.max(0, gastosMensualesInmueble - alquilerMensual);
+    // Comparamos: (alquiler + servicios) vs (gastos propietario + servicios)
+    const diferencialAlquiler = Math.max(0, gastosMensualesInmueble - gastosMensualesAlquiler);
     
     let inversionAlquiler = disponible * Math.pow(1 + tasaInv, anos);
     let inversionDiferencialAlquiler = 0;
@@ -220,15 +242,19 @@ function CalculadoraInmuebleContent() {
         gastoTotal: totalGastadoInmueble,
         
         // Desglose gastos mensuales
-        desglose: {
+        desglosePropietario: {
           expensas,
           impuestosMunicipales,
           seguro,
+          mantenimiento,
+          total: gastosPropietario
+        },
+        desgloseServicios: {
           luz,
           agua,
           gas,
           internet,
-          mantenimiento
+          total: serviciosBasicos
         },
         
         // Apreciación
@@ -247,7 +273,9 @@ function CalculadoraInmuebleContent() {
         costoReal: costoRealInmueble
       },
       alquiler: {
-        gastoMensual: alquilerMensual,
+        alquilerMensual: alquilerMensual,
+        serviciosBasicos: serviciosBasicos,
+        gastoMensualTotal: gastosMensualesAlquiler,
         gastoTotal: totalGastadoAlquiler,
         inversionInicial: disponible,
         inversionFinal: inversionTotalAlquiler,
@@ -345,24 +373,205 @@ function CalculadoraInmuebleContent() {
             </CardContent>
           </Card>
 
-          {/* Gastos Mensuales */}
+          {/* Gastos Iniciales */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-primary" />
-                Gastos Mensuales del Inmueble
+                <FileText className="h-5 w-5 text-primary" />
+                Gastos Iniciales de Compra
               </CardTitle>
               <CardDescription>
-                Gastos recurrentes que tendrás cada mes al ser propietario
+                Gastos que pagas una sola vez al comprar. Elige si ingresar el monto total o el porcentaje.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Escrituración */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="escrituracion">Escrituración y Gastos Legales</Label>
+                  <div className="flex gap-1 bg-muted rounded-md p-1">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, modoEscrituracion: "porcentaje" }))}
+                      className={`px-3 py-1 text-xs rounded transition-colors ${
+                        formData.modoEscrituracion === "porcentaje" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted-foreground/10"
+                      }`}
+                    >
+                      %
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, modoEscrituracion: "monto" }))}
+                      className={`px-3 py-1 text-xs rounded transition-colors ${
+                        formData.modoEscrituracion === "monto" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted-foreground/10"
+                      }`}
+                    >
+                      $
+                    </button>
+                  </div>
+                </div>
+                {formData.modoEscrituracion === "porcentaje" ? (
+                  <NumberInput
+                    id="porcentajeEscrituracion"
+                    name="porcentajeEscrituracion"
+                    placeholder="3%"
+                    value={formData.porcentajeEscrituracion}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <NumberInput
+                    id="escrituracion"
+                    name="escrituracion"
+                    placeholder="$6000"
+                    value={formData.escrituracion}
+                    onChange={handleChange}
+                  />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {formData.modoEscrituracion === "porcentaje" 
+                    ? `≈ ${formatMoney(calcularGastoInicial('escrituracion', formData.porcentajeEscrituracion, 'modoEscrituracion'))}`
+                    : `≈ ${((parseFloat(formData.escrituracion) || 0) / (parseFloat(formData.precioInmueble) || 1) * 100).toFixed(2)}% del precio`
+                  }
+                </p>
+              </div>
+
+              {/* Impuesto a la Transferencia */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="impuestoTransferencia">Impuesto a la Transferencia</Label>
+                  <div className="flex gap-1 bg-muted rounded-md p-1">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, modoImpuesto: "porcentaje" }))}
+                      className={`px-3 py-1 text-xs rounded transition-colors ${
+                        formData.modoImpuesto === "porcentaje" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted-foreground/10"
+                      }`}
+                    >
+                      %
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, modoImpuesto: "monto" }))}
+                      className={`px-3 py-1 text-xs rounded transition-colors ${
+                        formData.modoImpuesto === "monto" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted-foreground/10"
+                      }`}
+                    >
+                      $
+                    </button>
+                  </div>
+                </div>
+                {formData.modoImpuesto === "porcentaje" ? (
+                  <NumberInput
+                    id="porcentajeImpuesto"
+                    name="porcentajeImpuesto"
+                    placeholder="1.5%"
+                    value={formData.porcentajeImpuesto}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <NumberInput
+                    id="impuestoTransferencia"
+                    name="impuestoTransferencia"
+                    placeholder="$3000"
+                    value={formData.impuestoTransferencia}
+                    onChange={handleChange}
+                  />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {formData.modoImpuesto === "porcentaje" 
+                    ? `≈ ${formatMoney(calcularGastoInicial('impuestoTransferencia', formData.porcentajeImpuesto, 'modoImpuesto'))}`
+                    : `≈ ${((parseFloat(formData.impuestoTransferencia) || 0) / (parseFloat(formData.precioInmueble) || 1) * 100).toFixed(2)}% del precio`
+                  }
+                </p>
+              </div>
+
+              {/* Comisión Inmobiliaria */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="comisionInmobiliaria">Comisión Inmobiliaria</Label>
+                  <div className="flex gap-1 bg-muted rounded-md p-1">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, modoComision: "porcentaje" }))}
+                      className={`px-3 py-1 text-xs rounded transition-colors ${
+                        formData.modoComision === "porcentaje" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted-foreground/10"
+                      }`}
+                    >
+                      %
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, modoComision: "monto" }))}
+                      className={`px-3 py-1 text-xs rounded transition-colors ${
+                        formData.modoComision === "monto" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted-foreground/10"
+                      }`}
+                    >
+                      $
+                    </button>
+                  </div>
+                </div>
+                {formData.modoComision === "porcentaje" ? (
+                  <NumberInput
+                    id="porcentajeComision"
+                    name="porcentajeComision"
+                    placeholder="4%"
+                    value={formData.porcentajeComision}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <NumberInput
+                    id="comisionInmobiliaria"
+                    name="comisionInmobiliaria"
+                    placeholder="$8000"
+                    value={formData.comisionInmobiliaria}
+                    onChange={handleChange}
+                  />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {formData.modoComision === "porcentaje" 
+                    ? `≈ ${formatMoney(calcularGastoInicial('comisionInmobiliaria', formData.porcentajeComision, 'modoComision'))}`
+                    : `≈ ${((parseFloat(formData.comisionInmobiliaria) || 0) / (parseFloat(formData.precioInmueble) || 1) * 100).toFixed(2)}% del precio`
+                  }
+                </p>
+              </div>
+
+              <div className="bg-blue-500/10 rounded-lg p-3 text-xs text-muted-foreground border border-blue-500/20">
+                💡 <strong>Total gastos iniciales:</strong> {formatMoney(
+                  calcularGastoInicial('escrituracion', formData.porcentajeEscrituracion, 'modoEscrituracion') +
+                  calcularGastoInicial('impuestoTransferencia', formData.porcentajeImpuesto, 'modoImpuesto') +
+                  calcularGastoInicial('comisionInmobiliaria', formData.porcentajeComision, 'modoComision')
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Gastos del Propietario */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-primary" />
+                Gastos del Propietario
+              </CardTitle>
+              <CardDescription>
+                Gastos mensuales exclusivos de ser propietario (no aplican al alquilar)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="expensas" className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
-                    Expensas Mensuales ($)
-                  </Label>
+                  <Label htmlFor="expensas">Expensas Mensuales ($)</Label>
                   <NumberInput
                     id="expensas"
                     name="expensas"
@@ -373,10 +582,7 @@ function CalculadoraInmuebleContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="impuestosMunicipales" className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Impuestos Municipales Mensuales ($)
-                  </Label>
+                  <Label htmlFor="impuestosMunicipales">Impuestos Municipales ($)</Label>
                   <NumberInput
                     id="impuestosMunicipales"
                     name="impuestosMunicipales"
@@ -401,10 +607,37 @@ function CalculadoraInmuebleContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="luz" className="flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    Luz ($)
+                  <Label htmlFor="mantenimientoMensual" className="flex items-center gap-2">
+                    <Wrench className="h-4 w-4" />
+                    Mantenimiento/Reparaciones ($)
                   </Label>
+                  <NumberInput
+                    id="mantenimientoMensual"
+                    name="mantenimientoMensual"
+                    placeholder="100"
+                    value={formData.mantenimientoMensual}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Servicios Básicos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                Servicios Básicos
+              </CardTitle>
+              <CardDescription>
+                Servicios que pagas mensualmente tanto si compras como si alquilas
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="luz">Luz ($)</Label>
                   <NumberInput
                     id="luz"
                     name="luz"
@@ -446,73 +679,10 @@ function CalculadoraInmuebleContent() {
                     onChange={handleChange}
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="mantenimientoMensual" className="flex items-center gap-2">
-                    <Wrench className="h-4 w-4" />
-                    Mantenimiento/Reparaciones Mensuales ($)
-                  </Label>
-                  <NumberInput
-                    id="mantenimientoMensual"
-                    name="mantenimientoMensual"
-                    placeholder="100"
-                    value={formData.mantenimientoMensual}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Gastos Iniciales */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                Gastos Iniciales de Compra
-              </CardTitle>
-              <CardDescription>
-                Gastos que pagas una sola vez al comprar (se calculan automáticamente como % del precio, pero puedes editarlos)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="escrituracion">Escrituración y Gastos Legales ($)</Label>
-                  <NumberInput
-                    id="escrituracion"
-                    name="escrituracion"
-                    placeholder={`~${calcularGastoInicial('escrituracion', formData.porcentajeEscrituracion).toFixed(0)} (${formData.porcentajeEscrituracion}%)`}
-                    value={formData.escrituracion}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="impuestoTransferencia">Impuesto a la Transferencia ($)</Label>
-                  <NumberInput
-                    id="impuestoTransferencia"
-                    name="impuestoTransferencia"
-                    placeholder={`~${calcularGastoInicial('impuestoTransferencia', formData.porcentajeImpuesto).toFixed(0)} (${formData.porcentajeImpuesto}%)`}
-                    value={formData.impuestoTransferencia}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="comisionInmobiliaria">Comisión Inmobiliaria ($)</Label>
-                  <NumberInput
-                    id="comisionInmobiliaria"
-                    name="comisionInmobiliaria"
-                    placeholder={`~${calcularGastoInicial('comisionInmobiliaria', formData.porcentajeComision).toFixed(0)} (${formData.porcentajeComision}%)`}
-                    value={formData.comisionInmobiliaria}
-                    onChange={handleChange}
-                  />
-                </div>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground">
-                💡 Si dejas los campos vacíos, se calculan automáticamente: Escrituración {formData.porcentajeEscrituracion}%, Impuesto {formData.porcentajeImpuesto}%, Comisión {formData.porcentajeComision}%
+              <div className="bg-amber-500/10 rounded-lg p-3 text-xs text-muted-foreground border border-amber-500/20">
+                ℹ️ Estos servicios se incluyen en ambas opciones (comprar y alquilar) para una comparación justa
               </div>
             </CardContent>
           </Card>
