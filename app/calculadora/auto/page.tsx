@@ -25,7 +25,8 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
-  HelpCircle
+  HelpCircle,
+  ExternalLink
 } from "lucide-react";
 import {
   Tooltip,
@@ -540,7 +541,18 @@ function CalculadoraAutoContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="patente">Patente/Impuestos Anuales ($)</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="patente">Patente/Impuestos Anuales ($)</Label>
+                    <a
+                      href="https://www.dnrpa.gov.ar/valuacion/cons_valuacion.php?historial=no"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline flex items-center gap-1"
+                    >
+                      Consultar en DNRPA
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
                   <NumberInput
                     id="patente"
                     name="patente"
@@ -548,6 +560,9 @@ function CalculadoraAutoContent() {
                     value={formData.patente}
                     onChange={handleChange}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Usa el link para obtener la valuación oficial de tu auto
+                  </p>
                 </div>
 
                 <div className="space-y-2">
